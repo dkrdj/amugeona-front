@@ -16,6 +16,7 @@ class _ChangePasswordLayout extends State<ChangePasswordLayout> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
+
       return Scaffold(
         body: Center(
           child: Column(
