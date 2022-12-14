@@ -13,12 +13,12 @@ class _LoginLayout extends State<LoginLayout> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+        builder: (BuildContext context, BoxConstraints constraints) { //BoxConstraints constraints : 반응형
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      return Scaffold(
-        body: Center(
-          child: Column(
+      return Scaffold(  // return 할 객체 설명들 밑으로 쫙
+        body: Center( //center 대신 container column 괜찮
+          child: Column( // column & row 만 children을 넣을 수 있음
             children: <Widget>[
               Container(
                 height: width / 5,
@@ -76,7 +76,7 @@ class _LoginLayout extends State<LoginLayout> {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(width / 8, 0, width / 8, 0),
-                child: TextFormField(
+                child: TextFormField( // 입력 인풋
                   decoration: const InputDecoration(
                     isDense: true,
                     enabledBorder: UnderlineInputBorder(
@@ -136,7 +136,7 @@ class _LoginLayout extends State<LoginLayout> {
                 height: height / 10,
                 child: Padding(
                   padding: EdgeInsets.only(top: height / 30),
-                  child: ElevatedButton(
+                  child: ElevatedButton( // 정해진 크기가 없기 때문색이 채워진 버튼
                     onPressed: login,
                     child: const Text(
                       '로그인',
