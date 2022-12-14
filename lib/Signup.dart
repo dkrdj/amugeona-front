@@ -280,8 +280,7 @@ class _SignLayout extends State<SignupLayout> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width / 8, height / 100, 0, height / 20),
+                    padding: EdgeInsets.fromLTRB(width / 8, height / 100, 0, 0),
                     child: Text(
                       '이미 계정이 있나요?',
                       style: TextStyle(
@@ -293,8 +292,7 @@ class _SignLayout extends State<SignupLayout> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        0, height / 100, width / 8, height / 20),
+                    padding: EdgeInsets.fromLTRB(0, height / 100, width / 8, 0),
                     child: Text(
                       '로그인',
                       style: TextStyle(
