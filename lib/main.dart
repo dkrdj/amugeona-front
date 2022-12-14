@@ -1,4 +1,5 @@
 import 'package:amugeona/BottomNav.dart';
+import 'package:amugeona/MainLayout.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,8 +17,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'SCDream',
         primarySwatch: Colors.blue,
       ),
-      home: MyWidget(),
-      // const LoginLayout(),
+      home: Scaffold(
+        body: MainLayout(),
+      ),
     );
   }
 }
