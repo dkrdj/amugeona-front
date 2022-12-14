@@ -35,8 +35,7 @@ class _MainLayout extends State<MainLayout> {
       ];
 
       return ListView(
-        padding: EdgeInsets.fromLTRB(
-            width / 20, height / 20, width / 20, height / 20),
+        padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
         children: [
           Text(
             '오늘은 뭘 먹을까?',

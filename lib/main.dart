@@ -1,5 +1,5 @@
 import 'package:amugeona/BottomNav.dart';
-import 'package:amugeona/ChangePasswordLayout.dart';
+import 'package:amugeona/RecipeDetail.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: ChangePasswordLayout(),
+        body: RecipeDetail(),
       ),
     );
   }
