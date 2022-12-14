@@ -1,5 +1,6 @@
 import 'package:amugeona/BottomNav.dart';
 import 'package:amugeona/RecipeDetail.dart';
+import 'package:amugeona/TopNav.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,21 +16,12 @@ class MyApp extends StatelessWidget {
       title: 'Amugeona',
       theme: ThemeData(
         fontFamily: 'SCDream',
-        primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
+      home: const Scaffold(
+        appBar: TopNav(),
         body: RecipeDetail(),
+        bottomNavigationBar: BottomNav(),
       ),
     );
-  }
-}
-
-class MyWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-      child: BottomNav(),
-    ));
   }
 }
