@@ -26,11 +26,6 @@ class _TopNav extends State<TopNav> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      Icon bellIcon = Icon(
-        bell,
-        size: height,
-        color: Colors.black38,
-      );
       return Padding(
         padding: EdgeInsets.fromLTRB(width / 20, height / 4, width / 20, 0),
         child: Row(
@@ -46,13 +41,13 @@ class _TopNav extends State<TopNav> {
             ),
             Container(
               padding: EdgeInsets.only(
-                top: height / 12,
+                top: height / 8,
                 left: width / 20,
               ),
               child: Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: height / 8),
+                    padding: EdgeInsets.only(top: height / 12),
                     child: Text(
                       '현재 위치',
                       style: TextStyle(
