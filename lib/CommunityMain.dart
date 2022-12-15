@@ -18,6 +18,7 @@ class _CommunityMain extends State<CommunityMain> {
       final double height = constraints.maxHeight;
       List<String> restList = [];
       List<String> mealList = [];
+
       for (int i = 0; i < 10; i++) {
         restList.add('맛집${i + 1}입니다');
         mealList.add('식단${i + 1}입니다');

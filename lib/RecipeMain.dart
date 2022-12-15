@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RecipeMain extends StatefulWidget {
   const RecipeMain({super.key});
@@ -11,6 +12,7 @@ class _RecipeMain extends State<RecipeMain> {
   get login => null;
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
+  List<Recipe> recipeAll = [];
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +24,121 @@ class _RecipeMain extends State<RecipeMain> {
       for (int i = 0; i < 10; i++) {
         recipeList.add('레시피${i + 1}입니다');
       }
+      for (int i = 0; i < 10; i++) {
+        recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
+            'assets/images/logo.png'));
+      }
       return Padding(
         padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-        child: Column(
+        child: ListView(
           children: [
             searchBar(width - width / 15 * 2, height),
             getTopList(width, height, recipeList, '인기 레시피'),
             getOptionBar(width, height, options),
+            for (int i = 0; i < 10; i++)
+              getCard(width, height, recipeAll[i], i),
           ],
         ),
       );
     });
   }
 
+  Widget getCard(double width, double height, Recipe recipe, int idx) {
+    return Container(
+      width: width - width / 12 * 2,
+      height: height / 9,
+      padding: EdgeInsets.fromLTRB(width / 30, 0, width / 30, 0),
+      child: Column(children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: height / 100),
+                  child: Text(
+                    recipe.title,
+                    style: TextStyle(
+                      fontSize: width / 25,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: width / 50,
+                      ),
+                      child: Text(
+                        recipe.starRating.toStringAsFixed(1),
+                        style: TextStyle(
+                          fontSize: width / 40,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                    RatingBar.builder(
+                      initialRating:
+                          double.parse(recipe.starRating.toStringAsFixed(1)),
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding:
+                          EdgeInsets.symmetric(horizontal: width / 1000),
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.red,
+                      ),
+                      onRatingUpdate: (rating) {
+                        print(rating);
+                      },
+                      itemSize: width / 30,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: width / 20),
+                      child: Text(
+                        '(${recipe.starCnt})',
+                        style: TextStyle(
+                          fontSize: width / 40,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  recipe.thumbnail,
+                  height: height / 18,
+                ),
+              ],
+            ),
+          ],
+        ),
+        Container(
+          width: width - width / 12 * 2,
+          height: 2,
+          margin: EdgeInsets.only(top: height / 40),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black45, width: idx == 9 ? 0 : 1),
+          ),
+        )
+      ]),
+    );
+  }
+
   Widget getOptionBar(double width, double height, List<String> options) {
     return Container(
+      margin: EdgeInsets.only(
+        bottom: height / 50,
+        top: height / 70,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -67,15 +169,9 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget getAllList(double width, double height, List list) {
-    return ListView(
-      children: [],
-    );
-  }
-
   Widget getTopList(double width, double height, List list, String title) {
     return Container(
-      margin: EdgeInsets.only(top: height / 15),
+      margin: EdgeInsets.only(top: height / 24),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
       height: height / 3,
       width: width - width / 15 * 2,
@@ -215,4 +311,13 @@ class _RecipeMain extends State<RecipeMain> {
       ),
     );
   }
+}
+
+class Recipe {
+  String title;
+  double starRating;
+  int starCnt;
+  String thumbnail;
+
+  Recipe(this.title, this.starRating, this.starCnt, this.thumbnail);
 }
