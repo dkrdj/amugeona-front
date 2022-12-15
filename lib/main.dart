@@ -1,7 +1,8 @@
 import 'package:amugeona/BottomNav.dart';
-import 'package:amugeona/RecipeDetail.dart';
-import 'package:amugeona/TopNav.dart';
 import 'package:flutter/material.dart';
+
+import 'CommunityMain.dart';
+import 'TopNav.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const Scaffold(
         appBar: TopNav(),
-        body: RecipeDetail(),
+        body: CommunityMain(),
         bottomNavigationBar: BottomNav(),
       ),
     );
