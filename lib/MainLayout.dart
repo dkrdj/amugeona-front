@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'appBar/TopNav.dart';
+
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
 
@@ -34,91 +36,94 @@ class _MainLayout extends State<MainLayout> {
         Article('오늘 먹은 식단 개쩔었던 썰 푼다10', 89),
       ];
 
-      return ListView(
-        padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-        children: [
-          Text(
-            '오늘은 뭘 먹을까?',
-            style: TextStyle(
-              fontSize: width / 20,
-              fontWeight: FontWeight.w600,
+      return Scaffold(
+        appBar: TopNav(),
+        body: ListView(
+          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+          children: [
+            Text(
+              '오늘은 뭘 먹을까?',
+              style: TextStyle(
+                fontSize: width / 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Container(
-              height: height / 8,
-              margin: EdgeInsets.only(top: height / 30, bottom: height / 15),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: imageList.length,
-                itemBuilder: (BuildContext context, int idx) {
-                  return Container(
-                    height: height / 20,
-                    child: Image.asset(imageList[idx]),
-                  );
-                },
-              )),
-          Text(
-            '만들어 먹을까?',
-            style: TextStyle(
-              fontSize: width / 20,
-              fontWeight: FontWeight.w600,
+            Container(
+                height: height / 8,
+                margin: EdgeInsets.only(top: height / 30, bottom: height / 15),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: imageList.length,
+                  itemBuilder: (BuildContext context, int idx) {
+                    return Container(
+                      height: height / 20,
+                      child: Image.asset(imageList[idx]),
+                    );
+                  },
+                )),
+            Text(
+              '만들어 먹을까?',
+              style: TextStyle(
+                fontSize: width / 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Container(
-              height: height / 8,
-              margin: EdgeInsets.only(top: height / 30, bottom: height / 15),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: imageList.length,
-                itemBuilder: (BuildContext context, int idx) {
-                  return SizedBox(
-                    height: height / 20,
-                    child: Image.asset(imageList[idx]),
-                  );
-                },
-              )),
-          Text(
-            '최근 주목 받는 글',
-            style: TextStyle(
-              fontSize: width / 20,
-              fontWeight: FontWeight.w600,
+            Container(
+                height: height / 8,
+                margin: EdgeInsets.only(top: height / 30, bottom: height / 15),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: imageList.length,
+                  itemBuilder: (BuildContext context, int idx) {
+                    return SizedBox(
+                      height: height / 20,
+                      child: Image.asset(imageList[idx]),
+                    );
+                  },
+                )),
+            Text(
+              '최근 주목 받는 글',
+              style: TextStyle(
+                fontSize: width / 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Builder(
-            builder: (BuildContext context) {
-              return Column(
-                children: [
-                  for (int i = 0; i < articleList.length; i++)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: height / 30),
-                          child: Text(
-                            articleList[i].title,
-                            style: TextStyle(
-                              fontSize: width / 30,
+            Builder(
+              builder: (BuildContext context) {
+                return Column(
+                  children: [
+                    for (int i = 0; i < articleList.length; i++)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: height / 30),
+                            child: Text(
+                              articleList[i].title,
+                              style: TextStyle(
+                                fontSize: width / 30,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: height / 30),
-                          child: Text(
-                            '추천 ${articleList[i].likeCnt}',
-                            style: TextStyle(
-                              fontSize: width / 30,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.redAccent,
+                          Padding(
+                            padding: EdgeInsets.only(top: height / 30),
+                            child: Text(
+                              '추천 ${articleList[i].likeCnt}',
+                              style: TextStyle(
+                                fontSize: width / 30,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.redAccent,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
+                        ],
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
       );
     });
   }

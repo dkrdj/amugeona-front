@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import '../appBar/TopNav.dart';
+
 class RecipeMain extends StatefulWidget {
   const RecipeMain({super.key});
 
@@ -28,16 +30,19 @@ class _RecipeMain extends State<RecipeMain> {
         recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
             'assets/images/logo.png'));
       }
-      return Padding(
-        padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-        child: ListView(
-          children: [
-            searchBar(width - width / 15 * 2, height),
-            getTopList(width, height, recipeList, '인기 레시피'),
-            getOptionBar(width, height, options),
-            for (int i = 0; i < 10; i++)
-              getCard(width, height, recipeAll[i], i),
-          ],
+      return Scaffold(
+        appBar: TopNav(),
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+          child: ListView(
+            children: [
+              searchBar(width - width / 15 * 2, height),
+              getTopList(width, height, recipeList, '인기 레시피'),
+              getOptionBar(width, height, options),
+              for (int i = 0; i < 10; i++)
+                getCard(width, height, recipeAll[i], i),
+            ],
+          ),
         ),
       );
     });
@@ -292,7 +297,7 @@ class _RecipeMain extends State<RecipeMain> {
         children: [
           Container(
             padding: EdgeInsets.only(left: width / 15),
-            width: width * 0.86,
+            width: width * 0.85,
             child: TextFormField(
               decoration: const InputDecoration(
                 focusedBorder: InputBorder.none,
@@ -304,7 +309,7 @@ class _RecipeMain extends State<RecipeMain> {
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
             child: Icon(
               Icons.search,
-              size: width / 13 > height / 25 ? width / 13 : height / 25,
+              size: width / 15 > height / 27 ? width / 15 : height / 27,
             ),
           ),
         ],
