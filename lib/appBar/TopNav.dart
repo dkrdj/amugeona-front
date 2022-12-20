@@ -34,8 +34,8 @@ class _TopNav extends State<TopNav> {
             IconButton(
               icon: Icon(
                 bell,
-                size: height / 2,
-                color: _bellPressed ? Colors.red : Colors.black,
+                size: height / 2 > width / 12 ? width / 12 : height / 2,
+                color: _bellPressed ? Colors.red : Colors.black54,
               ),
               onPressed: bellPressed,
             ),
@@ -52,13 +52,14 @@ class _TopNav extends State<TopNav> {
                       '현재 위치',
                       style: TextStyle(
                         fontSize: height / 4,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
                   Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.black,
-                    size: height / 2.5,
+                    color: Colors.black54,
+                    size: height / 2.5 > width / 15 ? width / 15 : height / 2.5,
                   ),
                 ],
               ),
@@ -66,8 +67,8 @@ class _TopNav extends State<TopNav> {
             IconButton(
               icon: Icon(
                 Icons.settings,
-                size: height / 2,
-                color: _settingPressed ? Colors.pinkAccent : Colors.black,
+                size: height / 2 > width / 12 ? width / 12 : height / 2,
+                color: _settingPressed ? Colors.red : Colors.black54,
               ),
               onPressed: settingPressed,
             )
