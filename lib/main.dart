@@ -1,4 +1,4 @@
-import 'package:amugeona/community/CommunityDetail.dart';
+import 'package:amugeona/community/CommunityList.dart';
 import 'package:amugeona/router/TabNavigator.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: const _MyApp(),
-      home: CommunityDetail(),
+      home: CommunityList(),
     );
   }
 }

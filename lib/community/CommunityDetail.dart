@@ -24,7 +24,7 @@ class _CommunityDetailState extends State<CommunityDetail> {
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s',
         30,
         198,
-        "assets/images/logo.png",
+        'assets/images/logo.png',
         DateTime(2021, 12, 1, 16, 24, 30),
         DateTime(2021, 12, 4, 15, 23, 10));
 
