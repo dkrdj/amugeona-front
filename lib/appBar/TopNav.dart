@@ -18,7 +18,7 @@ class _TopNav extends State<TopNav> {
   @override
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
-    IconData bell = IconData(0xf3e1,
+    IconData bell = const IconData(0xf3e1,
         fontFamily: CupertinoIcons.iconFont,
         fontPackage: CupertinoIcons.iconFontPackage);
 
