@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_kakao_map/flutter_kakao_map.dart';
 import 'package:flutter_kakao_map/kakao_maps_flutter_platform_interface.dart';
@@ -14,7 +12,7 @@ class RestaurantMain extends StatefulWidget {
   State<RestaurantMain> createState() => _RestaurantMain();
 }
 
-const String mapKey = '121c47ef9eb22df63daf0f2f82ce51e0';
+// const String mapKey = '121c47ef9eb22df63daf0f2f82ce51e0';
 
 class _RestaurantMain extends State<RestaurantMain> {
   String _selectedValue1 = '지도중심';
@@ -22,54 +20,73 @@ class _RestaurantMain extends State<RestaurantMain> {
   List<String> options1 = ['지도중심', '내위치중심'];
   List<String> options2 = ['관련도순', '거리순'];
 
-  Completer<KakaoMapController> _controller = Completer();
-  MapType _mapType = MapType.standard;
-  CameraPosition _cameraPosition =
-  CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
+  MapPoint _visibleRegion = MapPoint(37.5087553, 127.0632877);
+  CameraPosition _kInitialPosition =
+      CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
 
-  void _onMapCreated(KakaoMapController controller) {
-    if (_controller.isCompleted) _controller = Completer();
-    _controller.complete(controller);
+  void onMapCreated(KakaoMapController controller) async {
+    final MapPoint visibleRegion = await controller.getMapCenterPoint();
+    setState(() {
+      KakaoMapController mapController = controller;
+      _visibleRegion = visibleRegion;
+    });
   }
+
+  // Completer<KakaoMapController> _controller = Completer();
+  // MapType _mapType = MapType.standard;
+  // CameraPosition _cameraPosition =
+  // CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
+
+  // void _onMapCreated(KakaoMapController controller) {
+  //   if (_controller.isCompleted) _controller = Completer();
+  //   _controller.complete(controller);
+  // }
 
   @override
   Widget build(BuildContext context) {
     String keyword = '현재 위치';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final double width = constraints.maxWidth;
-          final double height = constraints.maxHeight;
-          return Scaffold(
-            appBar: TopNav(
-              keyword: keyword,
-            ),
-            body: Padding(
-              padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-              child: Column(
-                children: [
-                  searchBar(width - width / 15 * 2, height),
-                  kakaoMap(width - width / 15 * 2, height),
-                ],
-              ),
-            ),
-          );
-        });
+      final double width = constraints.maxWidth;
+      final double height = constraints.maxHeight;
+      return Scaffold(
+        appBar: TopNav(
+          keyword: keyword,
+        ),
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+          child: Column(
+            children: [
+              searchBar(width - width / 15 * 2, height),
+              Center(
+                  child: SizedBox(
+                      width: 300.0,
+                      height: 200.0,
+                      child: KakaoMap(
+                          onMapCreated: onMapCreated,
+                          initialCameraPosition: _kInitialPosition)))
+              // kakaoMap(width - width / 15 * 2, height),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
-  Widget kakaoMap(double width, double height) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: width,
-        height: height,
-        child: KakaoMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: _cameraPosition,
-          mapType: _mapType,
-        ),
-      ),
-    );
-  }
+  // Widget kakaoMap(double width, double height) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: Container(
+  //       width: width,
+  //       height: height,
+  //       child: KakaoMap(
+  //         onMapCreated: _onMapCreated,
+  //         initialCameraPosition: _cameraPosition,
+  //         mapType: _mapType,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget searchBar(double width, double height) {
     return Container(
