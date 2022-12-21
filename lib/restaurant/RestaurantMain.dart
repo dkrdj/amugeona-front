@@ -29,22 +29,11 @@ class _RestaurantMain extends State<RestaurantMain> {
               child: ListView(
             children: [
               searchBar(width - width / 15 * 2, height),
-              naverMap(width - width / 15 * 2, height / 2),
             ],
           ),
         ),
       );
     });
-  }
-
-  Widget naverMap(double width, double height) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: width,
-        height: height,
-      ),
-    );
   }
 
 
