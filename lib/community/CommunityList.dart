@@ -4,7 +4,9 @@ import '../appBar/TopNav.dart';
 import '../item/Article.dart';
 
 class CommunityList extends StatefulWidget {
-  const CommunityList({super.key});
+  const CommunityList({super.key, required this.boardSeq});
+
+  final int boardSeq;
 
   @override
   State<CommunityList> createState() => _CommunityList();
@@ -38,26 +40,31 @@ class _CommunityList extends State<CommunityList> {
             DateTime(2021, 12, 1, 16, 24, 30),
             DateTime(2021, 12, 4, 15, 23, 10)));
       }
-
+      String keyword;
+      if (widget.boardSeq == 1) {
+        keyword = '맛집 추천';
+      } else {
+        keyword = '식단 자랑';
+      }
       return Scaffold(
-        appBar: TopNav(),
-        body: Padding(
+        appBar: TopNav(
+          keyword: keyword,
+        ),
+        body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-          child: ListView(
-            children: [
-              Text(
-                '식단 자랑',
-                style: TextStyle(
-                  fontSize: width / 15,
-                  fontWeight: FontWeight.w600,
-                ),
+          children: [
+            Text(
+              '식단 자랑',
+              style: TextStyle(
+                fontSize: width / 15,
+                fontWeight: FontWeight.w600,
               ),
-              getList(width, height, restList, '맛집 추천'),
-              getOptionBar(width, height, options),
-              for (int i = 0; i < 10; i++)
-                getCard(width, height, articleList[i], i)
-            ],
-          ),
+            ),
+            getList(width, height, restList, '맛집 추천'),
+            getOptionBar(width, height, options),
+            for (int i = 0; i < 10; i++)
+              getCard(width, height, articleList[i], i)
+          ],
         ),
       );
     });

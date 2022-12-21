@@ -17,6 +17,7 @@ class _CommunitySearch extends State<CommunitySearch> {
 
   @override
   Widget build(BuildContext context) {
+    String keyword = '커뮤니티';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
@@ -40,23 +41,23 @@ class _CommunitySearch extends State<CommunitySearch> {
       }
 
       return Scaffold(
-        appBar: TopNav(),
-        body: Padding(
+        appBar: TopNav(
+          keyword: keyword,
+        ),
+        body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-          child: ListView(
-            children: [
-              Text(
-                '검색 결과',
-                style: TextStyle(
-                  fontSize: width / 15,
-                  fontWeight: FontWeight.w600,
-                ),
+          children: [
+            Text(
+              '검색 결과',
+              style: TextStyle(
+                fontSize: width / 15,
+                fontWeight: FontWeight.w600,
               ),
-              getOptionBar(width, height, options),
-              for (int i = 0; i < 10; i++)
-                getCard(width, height, articleList[i], i)
-            ],
-          ),
+            ),
+            getOptionBar(width, height, options),
+            for (int i = 0; i < 10; i++)
+              getCard(width, height, articleList[i], i)
+          ],
         ),
       );
     });

@@ -35,9 +35,11 @@ class _MainLayout extends State<MainLayout> {
         Article('오늘 먹은 식단 개쩔었던 썰 푼다9', 120),
         Article('오늘 먹은 식단 개쩔었던 썰 푼다10', 89),
       ];
-
+      String keyword = '현재 위치';
       return Scaffold(
-        appBar: TopNav(),
+        appBar: TopNav(
+          keyword: keyword,
+        ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           children: [

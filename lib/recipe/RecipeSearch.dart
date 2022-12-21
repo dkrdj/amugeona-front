@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import '../appBar/TopNav.dart';
+
 class RecipeSearch extends StatefulWidget {
   const RecipeSearch({super.key});
 
@@ -15,6 +17,7 @@ class _RecipeSearch extends State<RecipeSearch> {
 
   @override
   Widget build(BuildContext context) {
+    String keyword = '레시피';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
@@ -23,9 +26,12 @@ class _RecipeSearch extends State<RecipeSearch> {
         recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
             'assets/images/logo.png'));
       }
-      return Padding(
-        padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-        child: ListView(
+      return Scaffold(
+        appBar: TopNav(
+          keyword: keyword,
+        ),
+        body: ListView(
+          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           children: [
             searchBar(width - width / 15 * 2, height),
             getOptionBar(width, height, options),
