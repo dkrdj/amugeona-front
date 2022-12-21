@@ -1,5 +1,4 @@
 import 'package:amugeona/router/TabNavigator.dart';
-import 'package:amugeona/user/MyPage.dart';
 import 'package:flutter/material.dart';
 
 import 'appBar/BottomNav.dart';
@@ -18,8 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const _MyApp(),
-      home: MyPage(),
+      home: const _MyApp(),
+      // home: MyPage(),
     );
   }
 }

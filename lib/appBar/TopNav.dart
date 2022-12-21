@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../user/MyPage.dart';
+
 class TopNav extends StatefulWidget with PreferredSizeWidget {
   const TopNav({super.key, required this.keyword});
 
@@ -103,6 +105,8 @@ class _TopNav extends State<TopNav> {
   void settingPressed() {
     setState(() {
       _settingPressed = !_settingPressed;
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const MyPage()));
     });
   }
 

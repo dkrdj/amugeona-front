@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../appBar/TopNav.dart';
+import '../provider/RecipeProviders.dart';
 
 class RecipeMain extends StatefulWidget {
   const RecipeMain({super.key});
@@ -15,6 +16,24 @@ class _RecipeMain extends State<RecipeMain> {
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
   List<Recipe> recipeAll = [];
+  late Future<Recipe> recipe;
+
+  RecipeProviders recipeProviders = RecipeProviders();
+
+  bool isLoading = true;
+
+  // Future initRecipe() async {
+  //   recipeAll = (await recipeProviders.getRecipe()).cast<Recipe>();
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    recipe = recipeProviders.getRecipe() as Future<Recipe>;
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +45,12 @@ class _RecipeMain extends State<RecipeMain> {
       List<String> recipeList = [];
       for (int i = 0; i < 10; i++) {
         recipeList.add('레시피${i + 1}입니다');
+        // recipeList.add(recipeAll[i]);
       }
-      for (int i = 0; i < 10; i++) {
-        recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-            'assets/images/logo.png'));
-      }
+      // for (int i = 0; i < 10; i++) {
+      //   recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
+      //       'assets/images/logo.png'));
+      // }
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
@@ -42,8 +62,23 @@ class _RecipeMain extends State<RecipeMain> {
               searchBar(width - width / 15 * 2, height),
               getTopList(width, height, recipeList, '인기 레시피'),
               getOptionBar(width, height, options),
-              for (int i = 0; i < 10; i++)
-                getCard(width, height, recipeAll[i], i),
+              isLoading
+                  ? Center(
+                      child: const CircularProgressIndicator(),
+                    )
+                  : FutureBuilder<Recipe>(
+                      future: recipe,
+                      builder: (context, abc) {
+                        if (abc.hasData) {
+                          return Text(abc.data!.title);
+                        } else if (abc.hasError) {
+                          return Text("${abc.error}");
+                        }
+                        return CircularProgressIndicator();
+                      },
+                    ),
+              // for (int i = 0; i < 10; i++)
+              //   getCard(width, height, recipeAll[i], i),
             ],
           ),
         ),
@@ -61,7 +96,6 @@ class _RecipeMain extends State<RecipeMain> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: height / 100),
