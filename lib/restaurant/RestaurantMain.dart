@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_kakao_map/flutter_kakao_map.dart';
 import 'package:flutter_kakao_map/kakao_maps_flutter_platform_interface.dart';
@@ -20,17 +22,14 @@ class _RestaurantMain extends State<RestaurantMain> {
   List<String> options1 = ['지도중심', '내위치중심'];
   List<String> options2 = ['관련도순', '거리순'];
 
-  late KakaoMapController _mapController;
-  MapPoint _mapPoint = MapPoint(37.5087553, 127.0632877);
+  Completer<KakaoMapController> _controller = Completer();
+  MapType _mapType = MapType.standard;
   CameraPosition _cameraPosition =
       CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
 
-  void onMapCreated(KakaoMapController controller) async {
-    final MapPoint mapPoint = await controller.getMapCenterPoint();
-    setState(() {
-      _mapController = controller;
-      _mapPoint = mapPoint;
-    });
+  void _onMapCreated(KakaoMapController controller) {
+    if (_controller.isCompleted) _controller = Completer();
+    _controller.complete(controller);
   }
 
   @override
@@ -42,33 +41,29 @@ class _RestaurantMain extends State<RestaurantMain> {
       return Scaffold(
         appBar: TopNav(),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-              child: Column(
+              padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+              child: ListView(
             children: [
               searchBar(width - width / 15 * 2, height),
-              SizedBox(
-                width: 300,
-                height: 200,
-                child: KakaoMap(
-                  onMapCreated: onMapCreated,
-                  initialCameraPosition: _cameraPosition,
-                ),
-              )
-              // kakaoMap(width - width / 15 * 2, height),
+              kakaoMap(width - width / 15 * 2, height),
             ],
           ),
-        ),
-      );
-    });
+            ),
+          );
+        });
   }
 
   Widget kakaoMap(double width, double height) {
-    return Container(
-      width: width,
-      height: height / 19,
-      child: KakaoMap(
-        onMapCreated: onMapCreated,
-        initialCameraPosition: _cameraPosition,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: width,
+        height: height,
+        child: KakaoMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: _cameraPosition,
+          mapType: _mapType,
+        ),
       ),
     );
   }
