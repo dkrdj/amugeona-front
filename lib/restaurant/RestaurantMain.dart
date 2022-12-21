@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_kakao_map/flutter_kakao_map.dart';
+import 'package:flutter_kakao_map/kakao_maps_flutter_platform_interface.dart';
 
 import '../appBar/TopNav.dart';
 // import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -10,11 +12,26 @@ class RestaurantMain extends StatefulWidget {
   State<RestaurantMain> createState() => _RestaurantMain();
 }
 
+const String mapKey = '121c47ef9eb22df63daf0f2f82ce51e0';
+
 class _RestaurantMain extends State<RestaurantMain> {
   String _selectedValue1 = '지도중심';
   String _selectedValue2 = '관련도순';
   List<String> options1 = ['지도중심', '내위치중심'];
   List<String> options2 = ['관련도순', '거리순'];
+
+  late KakaoMapController _mapController;
+  MapPoint _mapPoint = MapPoint(37.5087553, 127.0632877);
+  CameraPosition _cameraPosition =
+      CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
+
+  void onMapCreated(KakaoMapController controller) async {
+    final MapPoint mapPoint = await controller.getMapCenterPoint();
+    setState(() {
+      _mapController = controller;
+      _mapPoint = mapPoint;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +43,18 @@ class _RestaurantMain extends State<RestaurantMain> {
         appBar: TopNav(),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-              child: ListView(
+              child: Column(
             children: [
               searchBar(width - width / 15 * 2, height),
+              SizedBox(
+                width: 300,
+                height: 200,
+                child: KakaoMap(
+                  onMapCreated: onMapCreated,
+                  initialCameraPosition: _cameraPosition,
+                ),
+              )
+              // kakaoMap(width - width / 15 * 2, height),
             ],
           ),
         ),
@@ -36,6 +62,16 @@ class _RestaurantMain extends State<RestaurantMain> {
     });
   }
 
+  Widget kakaoMap(double width, double height) {
+    return Container(
+      width: width,
+      height: height / 19,
+      child: KakaoMap(
+        onMapCreated: onMapCreated,
+        initialCameraPosition: _cameraPosition,
+      ),
+    );
+  }
 
   Widget searchBar(double width, double height) {
     return Container(
