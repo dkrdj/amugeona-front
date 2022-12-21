@@ -1,44 +1,45 @@
-class Recipe {
-final int recipeSeq;
-  final String title;
-  final String thumbnail;
-  final double starRating;
-  final int starCnt;
-  final List recipeIngredients;
-  final List recipeContents;
-  final List recipeImages;
+import 'package:amugeona/item/RecipeContent.dart';
+import 'package:amugeona/item/RecipeIngredient.dart';
 
-  Recipe.json({
-    required this.recipeSeq,
-    required this.title,
-    required this.thumbnail,
-    required this.starRating,
-    required this.starCnt,
-    required this.recipeIngredients,
-    required this.recipeContents,
-    required this.recipeImages,
-  });
+import 'RecipeImage.dart';
+
+class Recipe {
+  int? recipeSeq;
+  String? title;
+  String? thumbnail;
+  double? starRating;
+  int? starCnt;
+  List? recipeIngredients;
+  List? recipeContents;
+  List? recipeImages;
 
   Recipe(
-      this.recipeSeq,
+      {this.recipeSeq,
       this.title,
       this.thumbnail,
       this.starRating,
       this.starCnt,
       this.recipeIngredients,
       this.recipeContents,
-      this.recipeImages);
+      this.recipeImages});
 
-  factory Recipe.fromJson(Map<String, dynamic>? json) {
-    return Recipe.json(
-      recipeSeq: json?['recipeSeq'],
-      title: json?['title'],
-      thumbnail: json?['thumbnail'],
-      starRating: json?['starRating'],
-      starCnt: json?['starCnt'],
-      recipeIngredients: json?['recipeIngredients'],
-      recipeContents: json?['recipeContents'],
-      recipeImages: json?['recipeImages'],
+  factory Recipe.fromJson(Map<String, dynamic> json) {
+    var recipeIngredientList = (json['recipeIngredients'] ?? []) as List;
+    var recipeContentList = (json['recipeContents'] ?? []) as List;
+    var recipeImageList = (json['recipeImages'] ?? []) as List;
+    return Recipe(
+      recipeSeq: json['recipeSeq'],
+      title: json['title'],
+      thumbnail: json['thumbnail'],
+      starRating: json['starRating'] ?? 0,
+      starCnt: json['starCnt'] ?? 0,
+      recipeIngredients: recipeIngredientList
+          .map((i) => RecipeIngredient.fromJson(i))
+          .toList(),
+      recipeContents:
+          recipeContentList.map((i) => RecipeContent.fromJson(i)).toList(),
+      recipeImages:
+          recipeImageList.map((i) => RecipeImage.fromJson(i)).toList(),
     );
   }
 }

@@ -1,8 +1,21 @@
 class RecipeImage {
-  int imgSeq;
-  int recipeSeq;
-  String url;
-  int contentIdx;
+  final int imgSeq;
+  final int recipeSeq;
+  final String url;
+  final int contentIdx;
 
-  RecipeImage(this.imgSeq, this.recipeSeq, this.url, this.contentIdx);
+  RecipeImage(
+      {required this.imgSeq,
+      required this.recipeSeq,
+      required this.url,
+      required this.contentIdx});
+
+  factory RecipeImage.fromJson(Map<String, dynamic> json) {
+    return RecipeImage(
+      imgSeq: json['imgSeq'],
+      recipeSeq: json['recipeSeq'],
+      url: json['url'],
+      contentIdx: json['contentIdx'],
+    );
+  }
 }

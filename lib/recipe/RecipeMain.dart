@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
-import '../provider/RecipeProviders.dart';
+import '../item/Recipe.dart';
 
 class RecipeMain extends StatefulWidget {
   const RecipeMain({super.key});
@@ -11,40 +14,53 @@ class RecipeMain extends StatefulWidget {
   State<RecipeMain> createState() => _RecipeMain();
 }
 
+Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
+  var uri = Uri.http('54.180.86.129:8080', 'recipe/list',
+      {'orderBy': orderBy, 'page': page.toString()});
+
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
+  print("여기오냐?1");
+
+  if (response.statusCode == 200) {
+    print("여기오냐?2");
+    var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
+    print("여기오냐?3");
+    return list.map((recipe) => Recipe.fromJson(recipe)).toList();
+  } else {
+    print("여기오냐?4");
+    throw Exception("안넘어옴");
+  }
+}
+
 class _RecipeMain extends State<RecipeMain> {
-  get login => null;
+  late Future<List<Recipe>> recipeList;
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
-  List<Recipe> recipeAll = [];
-  late Future<Recipe> recipe;
-
-  RecipeProviders recipeProviders = RecipeProviders();
-
-  bool isLoading = true;
-
-  // Future initRecipe() async {
-  //   recipeAll = (await recipeProviders.getRecipe()).cast<Recipe>();
-  // }
 
   @override
   void initState() {
     super.initState();
-    recipe = recipeProviders.getRecipe() as Future<Recipe>;
-    setState(() {
-      isLoading = false;
-    });
+    print("여기됨?");
+    recipeList = fetchRecipe('recipeSeq', 0);
+    print("여기됨?2");
+    print(recipeList);
   }
 
   @override
   Widget build(BuildContext context) {
     String keyword = '레시피';
+
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      List<String> recipeList = [];
+      List<String> favoriteList = [];
       for (int i = 0; i < 10; i++) {
-        recipeList.add('레시피${i + 1}입니다');
+        favoriteList.add('레시피${i + 1}입니다');
         // recipeList.add(recipeAll[i]);
       }
       // for (int i = 0; i < 10; i++) {
@@ -60,23 +76,23 @@ class _RecipeMain extends State<RecipeMain> {
           child: ListView(
             children: [
               searchBar(width - width / 15 * 2, height),
-              getTopList(width, height, recipeList, '인기 레시피'),
+              getTopList(width, height, favoriteList, '인기 레시피'),
               getOptionBar(width, height, options),
-              isLoading
-                  ? Center(
-                      child: const CircularProgressIndicator(),
-                    )
-                  : FutureBuilder<Recipe>(
-                      future: recipe,
-                      builder: (context, abc) {
-                        if (abc.hasData) {
-                          return Text(abc.data!.title);
-                        } else if (abc.hasError) {
-                          return Text("${abc.error}");
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
+              FutureBuilder<List<Recipe>>(
+                future: recipeList,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: <Widget>[
+                        ...snapshot.data!.map(
+                          (e) => getCard(width, height, e, 1),
+                        ),
+                      ],
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
               // for (int i = 0; i < 10; i++)
               //   getCard(width, height, recipeAll[i], i),
             ],
@@ -96,11 +112,14 @@ class _RecipeMain extends State<RecipeMain> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: height / 100),
                   child: Text(
-                    recipe.title,
+                    recipe.title!.length < 15
+                        ? recipe.title!
+                        : '${recipe.title!.substring(0, 15)}...',
                     style: TextStyle(
                       fontSize: width / 25,
                       fontWeight: FontWeight.w300,
@@ -114,7 +133,7 @@ class _RecipeMain extends State<RecipeMain> {
                         right: width / 50,
                       ),
                       child: Text(
-                        recipe.starRating.toStringAsFixed(1),
+                        recipe.starRating!.toStringAsFixed(1),
                         style: TextStyle(
                           fontSize: width / 40,
                           color: Colors.red,
@@ -123,7 +142,7 @@ class _RecipeMain extends State<RecipeMain> {
                     ),
                     RatingBar.builder(
                       initialRating:
-                          double.parse(recipe.starRating.toStringAsFixed(1)),
+                          double.parse(recipe.starRating!.toStringAsFixed(1)),
                       minRating: 1,
                       direction: Axis.horizontal,
                       allowHalfRating: true,
@@ -155,9 +174,11 @@ class _RecipeMain extends State<RecipeMain> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  recipe.thumbnail,
+                Image.network(
+                  recipe.thumbnail!,
                   height: height / 18,
+                  width: width / 10,
+                  fit: BoxFit.cover,
                 ),
               ],
             ),
@@ -353,13 +374,4 @@ class _RecipeMain extends State<RecipeMain> {
       ),
     );
   }
-}
-
-class Recipe {
-  String title;
-  double starRating;
-  int starCnt;
-  String thumbnail;
-
-  Recipe(this.title, this.starRating, this.starCnt, this.thumbnail);
 }

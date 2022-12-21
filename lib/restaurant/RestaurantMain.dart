@@ -39,6 +39,18 @@ class _RestaurantMain extends State<RestaurantMain> {
     });
   }
 
+// Widget kakaoMap(double width, double height) {
+//   return Container(
+//     width: width / 3 * 2,
+//     height: height / 2,
+//     child: KakaoMap(
+//       onMapCreated: onMapCreated,
+//       initialCameraPosition: _kInitialPosition,
+//       mapType: MapType.standard,
+//     ),
+//   );
+// }
+
   Widget searchBar(double width, double height) {
     return Container(
       width: width,
