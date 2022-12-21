@@ -18,12 +18,15 @@ class _RestaurantMain extends State<RestaurantMain> {
 
   @override
   Widget build(BuildContext context) {
+    String keyword = '현재 위치';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
       return Scaffold(
-        appBar: TopNav(),
+        appBar: TopNav(
+          keyword: keyword,
+        ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           child: Column(

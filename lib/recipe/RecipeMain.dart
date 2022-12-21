@@ -18,6 +18,7 @@ class _RecipeMain extends State<RecipeMain> {
 
   @override
   Widget build(BuildContext context) {
+    String keyword = '레시피';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
@@ -31,7 +32,9 @@ class _RecipeMain extends State<RecipeMain> {
             'assets/images/logo.png'));
       }
       return Scaffold(
-        appBar: TopNav(),
+        appBar: TopNav(
+          keyword: keyword,
+        ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           child: ListView(

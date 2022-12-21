@@ -50,13 +50,21 @@ class _CommunityDetailState extends State<CommunityDetail> {
           DateTime(2021, 12, 1 + i * 2, 16, 24, 30),
           DateTime(2021, 12, 4 + i * 2, 15, 23, 10)));
     }
+    String keyword;
+    if (article.boardSeq == 1) {
+      keyword = '맛집 추천';
+    } else {
+      keyword = '식단 자랑';
+    }
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
       return Scaffold(
-        appBar: TopNav(),
+        appBar: TopNav(
+          keyword: keyword,
+        ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           children: [

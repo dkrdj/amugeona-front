@@ -1,5 +1,5 @@
-import 'package:amugeona/community/CommunitySearch.dart';
 import 'package:amugeona/router/TabNavigator.dart';
+import 'package:amugeona/user/MyPage.dart';
 import 'package:flutter/material.dart';
 
 import 'appBar/BottomNav.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: const _MyApp(),
-      home: CommunitySearch(),
+      home: MyPage(),
     );
   }
 }
