@@ -48,9 +48,6 @@ class _TopNav extends State<TopNav> {
           ),
         );
       default:
-        if (keyword == '마이페이지') {
-          _settingPressed = true;
-        }
         return Padding(
           padding: EdgeInsets.only(top: height / 30),
           child: Text(
