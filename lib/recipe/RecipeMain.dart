@@ -22,17 +22,13 @@ Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
-  print("여기오냐?1");
 
   if (response.statusCode == 200) {
-    print("여기오냐?2");
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
-    print("여기오냐?3");
     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
   } else {
-    print("여기오냐?4");
-    throw Exception("안넘어옴");
+    throw Exception("데이터를 받아오지 못함");
   }
 }
 
@@ -44,10 +40,7 @@ class _RecipeMain extends State<RecipeMain> {
   @override
   void initState() {
     super.initState();
-    print("여기됨?");
     recipeList = fetchRecipe('recipeSeq', 0);
-    print("여기됨?2");
-    print(recipeList);
   }
 
   @override
