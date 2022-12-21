@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_kakao_map/flutter_kakao_map.dart';
 import 'package:flutter_kakao_map/kakao_maps_flutter_platform_interface.dart';
@@ -23,7 +25,7 @@ class _RestaurantMain extends State<RestaurantMain> {
   Completer<KakaoMapController> _controller = Completer();
   MapType _mapType = MapType.standard;
   CameraPosition _cameraPosition =
-      CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
+  CameraPosition(target: MapPoint(37.5087553, 127.0632877), zoom: 5);
 
   void _onMapCreated(KakaoMapController controller) {
     if (_controller.isCompleted) _controller = Completer();
@@ -35,23 +37,23 @@ class _RestaurantMain extends State<RestaurantMain> {
     String keyword = '현재 위치';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final double width = constraints.maxWidth;
-      final double height = constraints.maxHeight;
-      return Scaffold(
-        appBar: TopNav(
-          keyword: keyword,
-        ),
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-          child: Column(
-            children: [
-              searchBar(width - width / 15 * 2, height),
-              kakaoMap(width - width / 15 * 2, height),
-            ],
-          ),
-        ),
-      );
-    });
+          final double width = constraints.maxWidth;
+          final double height = constraints.maxHeight;
+          return Scaffold(
+            appBar: TopNav(
+              keyword: keyword,
+            ),
+            body: Padding(
+              padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+              child: Column(
+                children: [
+                  searchBar(width - width / 15 * 2, height),
+                  kakaoMap(width - width / 15 * 2, height),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Widget kakaoMap(double width, double height) {
