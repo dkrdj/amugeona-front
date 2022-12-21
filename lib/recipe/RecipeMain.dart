@@ -97,7 +97,7 @@ class _RecipeMain extends State<RecipeMain> {
 
   Widget getCard(double width, double height, Recipe recipe, int idx) {
     return Container(
-      width: width - width / 12 * 2,
+      width: width - width / 15 * 2,
       height: height / 9,
       padding: EdgeInsets.fromLTRB(width / 30, 0, width / 30, 0),
       child: Column(children: [
