@@ -14,6 +14,7 @@ class _CommunityMain extends State<CommunityMain> {
 
   @override
   Widget build(BuildContext context) {
+    String keyword = '커뮤니티';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
@@ -27,82 +28,82 @@ class _CommunityMain extends State<CommunityMain> {
       }
 
       return Scaffold(
-        appBar: TopNav(),
-        body: Padding(
+        appBar: TopNav(
+          keyword: keyword,
+        ),
+        body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-          child: ListView(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width: width / 2 - width / 15 * 2,
-                    height: height / 16,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.pink, width: 1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: OutlinedButton(
-                        onPressed: null,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: width / 25),
-                              child: Text(
-                                '맛집 추천',
-                                style: TextStyle(
-                                  fontSize: width / 22,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  width: width / 2 - width / 15 * 2,
+                  height: height / 16,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.pink, width: 1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: OutlinedButton(
+                      onPressed: null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: width / 25),
+                            child: Text(
+                              '맛집 추천',
+                              style: TextStyle(
+                                fontSize: width / 22,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
                               ),
                             ),
-                            Icon(
-                              Icons.keyboard_arrow_right,
-                              size: width / 15,
-                              color: Colors.black,
-                            ),
-                          ],
-                        )),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_right,
+                            size: width / 15,
+                            color: Colors.black,
+                          ),
+                        ],
+                      )),
+                ),
+                Container(
+                  width: width / 2 - width / 15 * 2,
+                  height: height / 16,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.pink, width: 1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Container(
-                    width: width / 2 - width / 15 * 2,
-                    height: height / 16,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.pink, width: 1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: OutlinedButton(
-                        onPressed: null,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: width / 25),
-                              child: Text(
-                                '식단 자랑',
-                                style: TextStyle(
-                                  fontSize: width / 22,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
+                  child: OutlinedButton(
+                      onPressed: null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: width / 25),
+                            child: Text(
+                              '식단 자랑',
+                              style: TextStyle(
+                                fontSize: width / 22,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
                               ),
                             ),
-                            Icon(
-                              Icons.keyboard_arrow_right,
-                              size: width / 15,
-                              color: Colors.black,
-                            ),
-                          ],
-                        )),
-                  ),
-                ],
-              ),
-              getList(width, height, restList, '맛집 추천'),
-              getList(width, height, mealList, '식단 자랑'),
-            ],
-          ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_right,
+                            size: width / 15,
+                            color: Colors.black,
+                          ),
+                        ],
+                      )),
+                ),
+              ],
+            ),
+            getList(width, height, restList, '맛집 추천'),
+            getList(width, height, mealList, '식단 자랑'),
+          ],
         ),
       );
     });

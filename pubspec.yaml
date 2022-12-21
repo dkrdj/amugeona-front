@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_kakao_map: ^0.0.4
 
+  snapping_sheet: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +61,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
 
   # To add assets to your application, add an assets section, like this:
   assets:

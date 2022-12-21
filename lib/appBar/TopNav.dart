@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TopNav extends StatefulWidget with PreferredSizeWidget {
-  const TopNav({super.key});
+  const TopNav({super.key, required this.keyword});
+
+  final String keyword;
 
   @override
   _TopNav createState() => _TopNav();
@@ -15,10 +17,54 @@ class _TopNav extends State<TopNav> {
   bool _bellPressed = false;
   bool _settingPressed = false;
 
+  _TopNav();
+
+  Widget buildText(double width, double height, String keyword) {
+    switch (keyword) {
+      case '현재 위치':
+        return Container(
+          padding: EdgeInsets.only(
+            top: height / 30,
+            left: width / 20,
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: height / 30),
+                child: Text(
+                  '현재 위치',
+                  style: TextStyle(
+                    fontSize: height / 4,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_drop_down,
+                color: Colors.black54,
+                size: height / 2.5 > width / 15 ? width / 15 : height / 2.5,
+              ),
+            ],
+          ),
+        );
+      default:
+        return Padding(
+          padding: EdgeInsets.only(top: height / 30),
+          child: Text(
+            keyword,
+            style: TextStyle(
+              fontSize: height / 4,
+              color: Colors.black87,
+            ),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
-    IconData bell = IconData(0xf3e1,
+    IconData bell = const IconData(0xf3e1,
         fontFamily: CupertinoIcons.iconFont,
         fontPackage: CupertinoIcons.iconFontPackage);
 
@@ -34,40 +80,17 @@ class _TopNav extends State<TopNav> {
             IconButton(
               icon: Icon(
                 bell,
-                size: height / 2,
-                color: _bellPressed ? Colors.red : Colors.black,
+                size: height / 2.5 > width / 12 ? width / 12 : height / 2.5,
+                color: _bellPressed ? Colors.red : Colors.black54,
               ),
               onPressed: bellPressed,
             ),
-            Container(
-              padding: EdgeInsets.only(
-                top: height / 8,
-                left: width / 20,
-              ),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: height / 12),
-                    child: Text(
-                      '현재 위치',
-                      style: TextStyle(
-                        fontSize: height / 4,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black,
-                    size: height / 2.5,
-                  ),
-                ],
-              ),
-            ),
+            buildText(width, height, widget.keyword),
             IconButton(
               icon: Icon(
                 Icons.settings,
-                size: height / 2,
-                color: _settingPressed ? Colors.pinkAccent : Colors.black,
+                size: height / 2.5 > width / 12 ? width / 12 : height / 2.5,
+                color: _settingPressed ? Colors.red : Colors.black54,
               ),
               onPressed: settingPressed,
             )

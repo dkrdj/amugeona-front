@@ -1,61 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../appBar/TopNav.dart';
+import '../item/Article.dart';
 
-class RecipeMain extends StatefulWidget {
-  const RecipeMain({super.key});
+class CommunitySearch extends StatefulWidget {
+  const CommunitySearch({super.key});
 
   @override
-  State<RecipeMain> createState() => _RecipeMain();
+  State<CommunitySearch> createState() => _CommunitySearch();
 }
 
-class _RecipeMain extends State<RecipeMain> {
+class _CommunitySearch extends State<CommunitySearch> {
   get login => null;
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
-  List<Recipe> recipeAll = [];
 
   @override
   Widget build(BuildContext context) {
-    String keyword = '레시피';
+    String keyword = '커뮤니티';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      List<String> recipeList = [];
+      List<String> restList = [];
+      List articleList = [];
       for (int i = 0; i < 10; i++) {
-        recipeList.add('레시피${i + 1}입니다');
+        restList.add('맛집${i + 1}입니다');
+        articleList.add(Article(
+            1 + i,
+            1 + i,
+            '글쓴이$i',
+            1,
+            '제목$i',
+            '',
+            i * 15,
+            i * 50,
+            'assets/images/logo.png',
+            DateTime(2021, 12, 1, 16, 24, 30),
+            DateTime(2021, 12, 4, 15, 23, 10)));
       }
-      for (int i = 0; i < 10; i++) {
-        recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-            'assets/images/logo.png'));
-      }
+
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
         ),
-        body: Padding(
+        body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-          child: ListView(
-            children: [
-              searchBar(width - width / 15 * 2, height),
-              getTopList(width, height, recipeList, '인기 레시피'),
-              getOptionBar(width, height, options),
-              for (int i = 0; i < 10; i++)
-                getCard(width, height, recipeAll[i], i),
-            ],
-          ),
+          children: [
+            Text(
+              '검색 결과',
+              style: TextStyle(
+                fontSize: width / 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            getOptionBar(width, height, options),
+            for (int i = 0; i < 10; i++)
+              getCard(width, height, articleList[i], i)
+          ],
         ),
       );
     });
   }
 
-  Widget getCard(double width, double height, Recipe recipe, int idx) {
+  Widget getCard(double width, double height, Article article, int idx) {
     return Container(
       width: width - width / 12 * 2,
       height: height / 9,
-      padding: EdgeInsets.fromLTRB(width / 30, 0, width / 30, 0),
       child: Column(children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,7 +77,7 @@ class _RecipeMain extends State<RecipeMain> {
                 Padding(
                   padding: EdgeInsets.only(bottom: height / 100),
                   child: Text(
-                    recipe.title,
+                    article.title,
                     style: TextStyle(
                       fontSize: width / 25,
                       fontWeight: FontWeight.w300,
@@ -80,38 +91,28 @@ class _RecipeMain extends State<RecipeMain> {
                         right: width / 50,
                       ),
                       child: Text(
-                        recipe.starRating.toStringAsFixed(1),
+                        '${article.nickname}   조회 ${article.viewCnt}',
                         style: TextStyle(
                           fontSize: width / 40,
-                          color: Colors.red,
+                          color: Colors.black,
+                          letterSpacing: 1,
                         ),
                       ),
-                    ),
-                    RatingBar.builder(
-                      initialRating:
-                          double.parse(recipe.starRating.toStringAsFixed(1)),
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding:
-                          EdgeInsets.symmetric(horizontal: width / 1000),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.red,
-                      ),
-                      onRatingUpdate: (rating) {
-                        print(rating);
-                      },
-                      itemSize: width / 30,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: width / 20),
+                      padding: EdgeInsets.only(left: width / 50),
                       child: Text(
-                        '(${recipe.starCnt})',
+                        '추천 ${article.like}',
+                        style:
+                            TextStyle(fontSize: width / 40, color: Colors.red),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: width / 40),
+                      child: Text(
+                        '댓글 ${article.like}',
                         style: TextStyle(
-                          fontSize: width / 40,
-                        ),
+                            fontSize: width / 40, color: Colors.blueAccent),
                       ),
                     ),
                   ],
@@ -122,7 +123,7 @@ class _RecipeMain extends State<RecipeMain> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  recipe.thumbnail,
+                  article.url,
                   height: height / 18,
                 ),
               ],
@@ -130,7 +131,7 @@ class _RecipeMain extends State<RecipeMain> {
           ],
         ),
         Container(
-          width: width - width / 12 * 2,
+          width: width - width / 15 * 2,
           height: 2,
           margin: EdgeInsets.only(top: height / 40),
           decoration: BoxDecoration(
@@ -145,7 +146,6 @@ class _RecipeMain extends State<RecipeMain> {
     return Container(
       margin: EdgeInsets.only(
         bottom: height / 50,
-        top: height / 70,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -177,9 +177,9 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget getTopList(double width, double height, List list, String title) {
+  Widget getList(double width, double height, List list, String title) {
     return Container(
-      margin: EdgeInsets.only(top: height / 24),
+      margin: EdgeInsets.only(top: height / 50),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
       height: height / 3,
       width: width - width / 15 * 2,
@@ -287,45 +287,4 @@ class _RecipeMain extends State<RecipeMain> {
       ),
     );
   }
-
-  Widget searchBar(double width, double height) {
-    return Container(
-      width: width,
-      height: height / 19,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.only(left: width / 15),
-            width: width * 0.85,
-            child: TextFormField(
-              decoration: const InputDecoration(
-                focusedBorder: InputBorder.none,
-                hintText: 'Search',
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            child: Icon(
-              Icons.search,
-              size: width / 15 > height / 27 ? width / 15 : height / 27,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Recipe {
-  String title;
-  double starRating;
-  int starCnt;
-  String thumbnail;
-
-  Recipe(this.title, this.starRating, this.starCnt, this.thumbnail);
 }
