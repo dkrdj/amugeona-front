@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:naver_map_plugin/naver_map_plugin.dart';
 
 import '../appBar/TopNav.dart';
 // import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -18,9 +15,6 @@ class _RestaurantMain extends State<RestaurantMain> {
   String _selectedValue2 = '관련도순';
   List<String> options1 = ['지도중심', '내위치중심'];
   List<String> options2 = ['관련도순', '거리순'];
-
-  Completer<NaverMapController> _controller = Completer();
-  MapType _mapType = MapType.Basic;
 
   @override
   Widget build(BuildContext context) {
@@ -49,18 +43,10 @@ class _RestaurantMain extends State<RestaurantMain> {
       child: Container(
         width: width,
         height: height,
-        child: NaverMap(
-          onMapCreated: _onMapCreated,
-          mapType: _mapType,
-        ),
       ),
     );
   }
 
-  void _onMapCreated(NaverMapController controller) {
-    if (_controller.isCompleted) _controller = Completer();
-    _controller.complete(controller);
-  }
 
   Widget searchBar(double width, double height) {
     return Container(
