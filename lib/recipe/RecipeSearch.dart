@@ -10,6 +10,25 @@ class RecipeSearch extends StatefulWidget {
   State<RecipeSearch> createState() => _RecipeSearch();
 }
 
+// Future<List<Recipe>> fetchSearchRecipe(
+//     String orderBy, String title, int page) async {
+//   var uri = Uri.http('54.180.86.129:8080', 'recipe/search-title',
+//       {'orderBy': orderBy, 'title': title, 'page': page.toString()});
+//
+//   final response = await http.get(uri, headers: {
+//     "access-token":
+//         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+//   });
+//
+//   if (response.statusCode == 200) {
+//     List<Recipe> list = jsonDecode(utf8.decode(response.bodyBytes));
+//     List<Recipe> a = list.map((e) => Reci)
+//     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
+//   } else {
+//     throw Exception("데이터를 받아오지 못함");
+//   }
+// }
+
 class _RecipeSearch extends State<RecipeSearch> {
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];

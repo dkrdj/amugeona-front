@@ -1,3 +1,4 @@
+import 'package:amugeona/recipe/RecipeSearch.dart';
 import 'package:amugeona/router/TabNavigator.dart';
 import 'package:flutter/material.dart';
 
@@ -17,8 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const _MyApp(),
-      // home: RecipeMain(),
+      // home: const _MyApp(),
+      home: RecipeSearch(),
     );
   }
 }
@@ -55,7 +56,7 @@ class _MyAppState extends State<_MyApp> {
     return WillPopScope(
       onWillPop: () async {
         final isFirstRouteInCurrentTab =
-            !await _navigatorKeys[_currentTab]!.currentState!.maybePop();
+        !await _navigatorKeys[_currentTab]!.currentState!.maybePop();
         if (isFirstRouteInCurrentTab) {
           // if not on the 'main' tab
           if (_currentTab != 'home') {

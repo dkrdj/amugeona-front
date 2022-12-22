@@ -34,6 +34,7 @@ Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
 
 class _RecipeMain extends State<RecipeMain> {
   late Future<List<Recipe>> recipeList;
+  late Future<List<Recipe>> popularList;
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
 
@@ -41,6 +42,7 @@ class _RecipeMain extends State<RecipeMain> {
   void initState() {
     super.initState();
     recipeList = fetchRecipe('recipeSeq', 0);
+    popularList = fetchRecipe('starRating', 0);
   }
 
   @override
@@ -51,15 +53,6 @@ class _RecipeMain extends State<RecipeMain> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      List<String> favoriteList = [];
-      for (int i = 0; i < 10; i++) {
-        favoriteList.add('레시피${i + 1}입니다');
-        // recipeList.add(recipeAll[i]);
-      }
-      // for (int i = 0; i < 10; i++) {
-      //   recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-      //       'assets/images/logo.png'));
-      // }
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
@@ -69,7 +62,14 @@ class _RecipeMain extends State<RecipeMain> {
           child: ListView(
             children: [
               searchBar(width - width / 15 * 2, height),
-              getTopList(width, height, favoriteList, '인기 레시피'),
+              FutureBuilder<List<Recipe>>(
+                  future: popularList,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return getTopList(width, height, snapshot.data!, '인기레시피');
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  }),
               getOptionBar(width, height, options),
               FutureBuilder<List<Recipe>>(
                 future: recipeList,
@@ -86,8 +86,6 @@ class _RecipeMain extends State<RecipeMain> {
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
-              // for (int i = 0; i < 10; i++)
-              //   getCard(width, height, recipeAll[i], i),
             ],
           ),
         ),
@@ -225,7 +223,8 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget getTopList(double width, double height, List list, String title) {
+  Widget getTopList(
+      double width, double height, List<Recipe> list, String title) {
     return Container(
       margin: EdgeInsets.only(top: height / 24),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
@@ -242,7 +241,7 @@ class _RecipeMain extends State<RecipeMain> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            '${title} TOP 10',
+            '${title} TOP 5',
             style: TextStyle(
               fontSize: width / 20,
               fontWeight: FontWeight.w600,
@@ -256,75 +255,18 @@ class _RecipeMain extends State<RecipeMain> {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < 5; i++)
                       Text(
-                        list[i],
+                        list[i].title!.length < 22
+                            ? '${i + 1}    ${list[i].title!}'
+                            : '${i + 1}    ${list[i].title!.substring(0, 22)}...',
                         style: TextStyle(
-                          fontSize: height / 40,
+                          fontSize: width / 25,
                           fontWeight: FontWeight.w400,
                           color: Colors.black87,
                         ),
-                      ),
-                  ],
-                ),
-                Container(
-                  width: 1,
-                  height: height / 4,
-                  margin: EdgeInsets.only(left: width / 30),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                    color: Colors.black38,
-                    width: 1.4,
-                  )),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 5; i < 10; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 5; i < 10; i++)
-                      Row(
-                        children: [
-                          Text(
-                            list[i],
-                            style: TextStyle(
-                              fontSize: height / 40,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
                       ),
                   ],
                 ),
@@ -358,13 +300,17 @@ class _RecipeMain extends State<RecipeMain> {
           ),
           Padding(
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            child: Icon(
-              Icons.search,
-              size: width / 15 > height / 27 ? width / 15 : height / 27,
-            ),
+            child:
+                IconButton(icon: Icon(Icons.search), onPressed: searchRecipe),
+            // child: Icon(
+            //   Icons.search,
+            //   size: width / 15 > height / 27 ? width / 15 : height / 27,
+            // ),
           ),
         ],
       ),
     );
   }
+
+  void searchRecipe() {}
 }
