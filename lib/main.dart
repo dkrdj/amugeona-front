@@ -1,4 +1,3 @@
-import 'package:amugeona/recipe/RecipeSearch.dart';
 import 'package:amugeona/router/TabNavigator.dart';
 import 'package:flutter/material.dart';
 
@@ -18,8 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const _MyApp(),
-      home: RecipeSearch(),
+      home: const _MyApp(),
+      // home: RecipeSearch(),
     );
   }
 }

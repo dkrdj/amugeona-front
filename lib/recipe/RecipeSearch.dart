@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
+import '../item/Recipe.dart';
 
 class RecipeSearch extends StatefulWidget {
   const RecipeSearch({super.key});
@@ -10,29 +14,37 @@ class RecipeSearch extends StatefulWidget {
   State<RecipeSearch> createState() => _RecipeSearch();
 }
 
-// Future<List<Recipe>> fetchSearchRecipe(
-//     String orderBy, String title, int page) async {
-//   var uri = Uri.http('54.180.86.129:8080', 'recipe/search-title',
-//       {'orderBy': orderBy, 'title': title, 'page': page.toString()});
-//
-//   final response = await http.get(uri, headers: {
-//     "access-token":
-//         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
-//   });
-//
-//   if (response.statusCode == 200) {
-//     List<Recipe> list = jsonDecode(utf8.decode(response.bodyBytes));
-//     List<Recipe> a = list.map((e) => Reci)
-//     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
-//   } else {
-//     throw Exception("데이터를 받아오지 못함");
-//   }
-// }
+Future<List<Recipe>> fetchSearchRecipe(
+    String orderBy, String title, int page) async {
+  var uri = Uri.http('54.180.86.129:8080', 'recipe/search-title',
+      {'orderBy': orderBy, 'title': title, 'page': page.toString()});
+
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
+
+  if (response.statusCode == 200) {
+    var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
+    return list.map((recipe) => Recipe.fromJson(recipe)).toList();
+  } else {
+    throw Exception("데이터를 받아오지 못함");
+  }
+}
 
 class _RecipeSearch extends State<RecipeSearch> {
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
   List<Recipe> recipeAll = [];
+
+  late Future<List<Recipe>> searchRecipe;
+
+  @override
+  void initState() {
+    super.initState();
+    searchRecipe = fetchSearchRecipe('recipeSeq', 'title', 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +53,10 @@ class _RecipeSearch extends State<RecipeSearch> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      for (int i = 0; i < 10; i++) {
-        recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-            'assets/images/logo.png'));
-      }
+      // for (int i = 0; i < 10; i++) {
+      //   recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
+      //       'assets/images/logo.png'));
+      // }
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
@@ -54,8 +66,23 @@ class _RecipeSearch extends State<RecipeSearch> {
           children: [
             searchBar(width - width / 15 * 2, height),
             getOptionBar(width, height, options),
-            for (int i = 0; i < 10; i++)
-              getCard(width, height, recipeAll[i], i),
+            FutureBuilder<List<Recipe>>(
+                future: searchRecipe,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: <Widget>[
+                        ...snapshot.data!
+                            .map((e) => getCard(width, height, e, 1))
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                })
+            // for (int i = 0; i < 10; i++)
+            //   getCard(width, height, recipeAll[i], i),
           ],
         ),
       );
@@ -77,7 +104,9 @@ class _RecipeSearch extends State<RecipeSearch> {
                 Padding(
                   padding: EdgeInsets.only(bottom: height / 100),
                   child: Text(
-                    recipe.title,
+                    recipe.title!.length < 15
+                        ? recipe.title!
+                        : '${recipe.title!.substring(0, 15)}...',
                     style: TextStyle(
                       fontSize: width / 25,
                       fontWeight: FontWeight.w300,
@@ -91,7 +120,7 @@ class _RecipeSearch extends State<RecipeSearch> {
                         right: width / 50,
                       ),
                       child: Text(
-                        recipe.starRating.toStringAsFixed(1),
+                        recipe.starRating!.toStringAsFixed(1),
                         style: TextStyle(
                           fontSize: width / 40,
                           color: Colors.red,
@@ -100,7 +129,7 @@ class _RecipeSearch extends State<RecipeSearch> {
                     ),
                     RatingBar.builder(
                       initialRating:
-                          double.parse(recipe.starRating.toStringAsFixed(1)),
+                          double.parse(recipe.starRating!.toStringAsFixed(1)),
                       minRating: 1,
                       direction: Axis.horizontal,
                       allowHalfRating: true,
@@ -133,7 +162,7 @@ class _RecipeSearch extends State<RecipeSearch> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  recipe.thumbnail,
+                  recipe.thumbnail!,
                   height: height / 18,
                 ),
               ],
@@ -219,13 +248,4 @@ class _RecipeSearch extends State<RecipeSearch> {
       ),
     );
   }
-}
-
-class Recipe {
-  String title;
-  double starRating;
-  int starCnt;
-  String thumbnail;
-
-  Recipe(this.title, this.starRating, this.starCnt, this.thumbnail);
 }

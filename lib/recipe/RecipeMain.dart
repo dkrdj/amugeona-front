@@ -300,17 +300,19 @@ class _RecipeMain extends State<RecipeMain> {
           ),
           Padding(
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            child:
-                IconButton(icon: Icon(Icons.search), onPressed: searchRecipe),
-            // child: Icon(
-            //   Icons.search,
-            //   size: width / 15 > height / 27 ? width / 15 : height / 27,
-            // ),
+            // child: IconButton(
+            //     icon: Icon(Icons.search),
+            //     iconSize: width / 15 > height / 27 ? width / 15 : height / 27,
+            //     onPressed: () {}),
+            child: Icon(
+              Icons.search,
+              size: width / 15 > height / 27 ? width / 15 : height / 27,
+            ),
           ),
         ],
       ),
     );
   }
 
-  void searchRecipe() {}
+// void searchRecipe() {}
 }
