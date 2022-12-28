@@ -28,24 +28,24 @@ Future<Position> getCurrentLocation() async {
 
   return position;
 }
-Future<List<Restaurant>> fetchRestaurant() async {
-  double? lng;
-  double? lat;
-  await getCurrentLocation().then((val) {
-    lng = val.longitude;
-    lat = val.latitude;
-  });
+Future<Map<String, dynamic>> fetchRestaurant(double lng, double lat) async {
+  if(lng <1){
+    await getCurrentLocation().then((val) {
+      lng = val.longitude;
+      lat = val.latitude;
+    });
+  }
   var uri = Uri.http('13.209.50.91:8080', 'restaurants',
       {'longitude': lng.toString(), 'latitude': lat.toString()});
   final response = await http.get(uri);
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-    List<Restaurant> a = list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
-    print(1);
-    a.map((e) {
-        print(e.toString());
-    });
-    return list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
+    List<Restaurant> resList = list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
+    List<Marker> markerList = resList.map((restaurant)=> Marker(markerId: restaurant.restaurantSeq!.toString(), position: LatLng(restaurant.latitude, restaurant.longitude), infoWindow: restaurant.title)).toList();
+    Map<String, dynamic> map = {};
+    map['resList'] = resList;
+    map['markerList'] = markerList;
+    return map;
   } else {
     throw Exception("데이터를 받아오지 못함");
   }
@@ -69,7 +69,13 @@ class _RestaurantMain extends State<RestaurantMain> {
   @override
   void initState() {
     super.initState();
-    resList = fetchRestaurant();
+    getCurrentLocation().then((val) {
+      lng = val.longitude;
+      lat = val.latitude;
+    });
+    Future<Map<String, dynamic>> map = fetchRestaurant(lng, lat);
+    resList = map.then((value)=>value['resList']);
+    markerList = map.then((value)=>value['markerList']);
   }
 
   @override
@@ -159,19 +165,9 @@ class _RestaurantMain extends State<RestaurantMain> {
                                     _selectedValue1 = str;
                                   });
                                 }),
-                            getOptionBar(width, height, options2, _selectedValue2,
-                                    (str) {
-                                  setState(() {
-                                    _selectedValue2 = str;
-                                  });
-                                }),
                           ],
                         ),
                         ...snapshot.data!.map((e) => getCard(width, height, e)),
-                        // ...snapshot.data!.map((e) {
-                        //   print(e.toString());
-                        //   return Text('h');
-                        // }),
                       ],
                     ),
                   );
@@ -193,21 +189,39 @@ class _RestaurantMain extends State<RestaurantMain> {
                   margin: EdgeInsets.only(
                     top: height / 25,
                   ),
-                  child: NaverMap(
-                    onMapCreated: _onMapCreated,
-                    locationButtonEnable: true,
-                    onCameraChange: (latLng, reason, isAnimated) {
-                      setState(() {
-                        lat = latLng.latitude;
-                        lng = latLng.longitude;
-                      });
+                  child: FutureBuilder<List<Marker>>(
+                    future: markerList,
+                    builder: (context, snapshot) {
+                      if(snapshot.hasData) {
+                        return NaverMap(
+                          initialCameraPosition: CameraPosition(target: LatLng(lat, lng), zoom: 16.0),
+                          onMapCreated: _onMapCreated,
+                          locationButtonEnable: true,
+                          markers: snapshot.data!,
+                          onCameraChange: (latLng, reason, isAnimated) {
+                            setState(() {
+                              lat = latLng.latitude;
+                              lng = latLng.longitude;
+                            });
+                          },
+                          onCameraIdle: () {
+                            setState(() {
+                              Future<
+                                  Map<String, dynamic>> map = fetchRestaurant(
+                                  lng, lat);
+                              resList = map.then((value) => value['resList']);
+                              markerList =
+                                  map.then((value) => value['markerList'])
+                                      .then((value) => value);
+                            });
+                          },
+                        );
+                      }
+                      else{
+                        return Container();
+                      }
                     },
-                    onCameraIdle: () {
-                      setState(() {
-                        // resList = fetchRestaurant();
-                      });
-                    },
-                  ),
+                  )
                 ),
               ],
             ),
