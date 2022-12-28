@@ -8,7 +8,6 @@ class Article {
   int? like;
   int? viewCnt;
 
-  String? url;
   String? createdAt;
   String? modifiedAt;
   String? info;
@@ -22,7 +21,6 @@ class Article {
       this.content,
       this.like,
       this.viewCnt,
-      this.url,
       this.info,
       this.createdAt,
       this.modifiedAt});
@@ -45,7 +43,6 @@ class Article {
       content: json['content'],
       like: json['articleLike'] ?? 0,
       viewCnt: json['viewCnt'] ?? 0,
-      url: json['url'],
       info: json['info'],
       createdAt:
           "${createdAtList.sublist(0, 3).join("-")} ${createdAtList.sublist(3, createdAtList.length).join(":")}",

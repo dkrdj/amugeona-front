@@ -25,13 +25,8 @@ Future<List<Recipe>> fetchSearchRecipe(
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
-  print("여기 오나");
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-    print("리스트");
-    print(list);
-    List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
-    print(a);
     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");
