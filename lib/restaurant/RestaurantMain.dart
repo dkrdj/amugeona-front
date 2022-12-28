@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'package:snapping_sheet/snapping_sheet.dart';
+import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
 import '../item/Restaurant.dart';
@@ -25,6 +28,29 @@ Future<Position> getCurrentLocation() async {
 
   return position;
 }
+Future<List<Restaurant>> fetchRestaurant() async {
+  double? lng;
+  double? lat;
+  await getCurrentLocation().then((val) {
+    lng = val.longitude;
+    lat = val.latitude;
+  });
+  var uri = Uri.http('13.209.50.91:8080', 'restaurants',
+      {'longitude': lng.toString(), 'latitude': lat.toString()});
+  final response = await http.get(uri);
+  if (response.statusCode == 200) {
+    var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    List<Restaurant> a = list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
+    print(1);
+    a.map((e) {
+        print(e.toString());
+    });
+    return list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
+  } else {
+    throw Exception("데이터를 받아오지 못함");
+  }
+
+}
 
 class _RestaurantMain extends State<RestaurantMain> {
   String _selectedValue1 = '지도중심';
@@ -37,20 +63,18 @@ class _RestaurantMain extends State<RestaurantMain> {
   double lng = 0.0;
   double lat = 0.0;
 
+  late Future<List<Restaurant>> resList;
+  late Future<List<Marker>> markerList;
+
   @override
   void initState() {
     super.initState();
-    getCurrentLocation().then((val) {
-      lng = val.longitude;
-      lat = val.latitude;
-    });
+    resList = fetchRestaurant();
   }
 
   @override
   Widget build(BuildContext context) {
     String keyword = '현재 위치';
-
-    List<Restaurant> resList = [];
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -116,33 +140,45 @@ class _RestaurantMain extends State<RestaurantMain> {
           sheetBelow: SnappingSheetContent(
             sizeBehavior: SheetSizeStatic(size: 300),
             draggable: true,
-            child: Container(
-              color: Colors.white,
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                    width / 15, height / 100, width / 15, 0),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      getOptionBar(width, height, options1, _selectedValue1,
-                          (str) {
-                        setState(() {
-                          _selectedValue1 = str;
-                        });
-                      }),
-                      getOptionBar(width, height, options2, _selectedValue2,
-                          (str) {
-                        setState(() {
-                          _selectedValue2 = str;
-                        });
-                      }),
-                    ],
-                  ),
-                  for (int i = 0; i < resList.length; i++)
-                    getCard(width, height, resList[i]),
-                ],
-              ),
+            child: FutureBuilder<List<Restaurant>>(
+              future: resList,
+              builder:(context, snapshot) {
+                if(snapshot.hasData){
+                  return Container(
+                    color: Colors.white,
+                    child: ListView(
+                      padding: EdgeInsets.fromLTRB(
+                          width / 15, height / 100, width / 15, 0),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            getOptionBar(width, height, options1, _selectedValue1,
+                                    (str) {
+                                  setState(() {
+                                    _selectedValue1 = str;
+                                  });
+                                }),
+                            getOptionBar(width, height, options2, _selectedValue2,
+                                    (str) {
+                                  setState(() {
+                                    _selectedValue2 = str;
+                                  });
+                                }),
+                          ],
+                        ),
+                        ...snapshot.data!.map((e) => getCard(width, height, e)),
+                        // ...snapshot.data!.map((e) {
+                        //   print(e.toString());
+                        //   return Text('h');
+                        // }),
+                      ],
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+
             ),
           ),
           child: Padding(
@@ -168,7 +204,7 @@ class _RestaurantMain extends State<RestaurantMain> {
                     },
                     onCameraIdle: () {
                       setState(() {
-                        //lat과 lng로 api요청 보내기
+                        // resList = fetchRestaurant();
                       });
                     },
                   ),
@@ -266,7 +302,7 @@ class _RestaurantMain extends State<RestaurantMain> {
   }
 
   Widget getCard(double width, double height, Restaurant restaurant) {
-    double dist = getDist(lat, lng, restaurant.latitude, restaurant.longitude);
+    double dist = getDist(lat, lng, restaurant.latitude!, restaurant.longitude!);
     String distance = "";
     if (dist > 1000.0) {
       dist = dist / 1000;
@@ -292,7 +328,7 @@ class _RestaurantMain extends State<RestaurantMain> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        restaurant.title,
+                        restaurant.title!,
                         style: TextStyle(
                           fontSize: width / 28,
                         ),
@@ -303,7 +339,7 @@ class _RestaurantMain extends State<RestaurantMain> {
                           bottom: height / 400,
                         ),
                         child: Text(
-                          restaurant.category,
+                          restaurant.category!,
                           style: TextStyle(
                             fontSize: width / 40,
                             color: Colors.black54,
@@ -319,7 +355,7 @@ class _RestaurantMain extends State<RestaurantMain> {
                           right: width / 100,
                         ),
                         child: Text(
-                          restaurant.starRating.toStringAsFixed(1),
+                          restaurant.starRating!.toStringAsFixed(1),
                           style: TextStyle(
                             fontSize: width / 40,
                             color: Colors.red,
@@ -328,7 +364,7 @@ class _RestaurantMain extends State<RestaurantMain> {
                       ),
                       RatingBarIndicator(
                         rating: double.parse(
-                            restaurant.starRating.toStringAsFixed(1)),
+                            restaurant.starRating!.toStringAsFixed(1)),
                         direction: Axis.horizontal,
                         itemCount: 5,
                         itemBuilder: (context, _) => const Icon(
@@ -358,14 +394,17 @@ class _RestaurantMain extends State<RestaurantMain> {
                       Padding(
                         padding: EdgeInsets.only(left: width / 100),
                         child: Text(
-                          restaurant.address,
+                          restaurant.address!.length < 23
+                              ? restaurant.address!
+                              : '${restaurant.address!.substring(0, 23)}...',
                           style: TextStyle(color: Colors.black54),
                         ),
                       ),
                     ],
                   ),
                   Text(
-                    restaurant.number == '' ? '정보 없음' : restaurant.number,
+                    restaurant.number==null ? '정보 없음':restaurant.number!,
+                    // '정보 없음',
                     style: const TextStyle(
                       color: CupertinoColors.activeBlue,
                     ),
