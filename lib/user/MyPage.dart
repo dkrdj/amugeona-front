@@ -33,6 +33,7 @@ class _MyPage extends State<MyPage> {
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: true,
         ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 60, width / 15, 0),

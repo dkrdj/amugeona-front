@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shashashark.amugeona">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
@@ -33,6 +34,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <!--현재 위치 사용-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 </manifest>

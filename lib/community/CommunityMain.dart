@@ -30,6 +30,7 @@ class _CommunityMain extends State<CommunityMain> {
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),

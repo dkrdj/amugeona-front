@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:amugeona/recipe/RecipeSearch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
+import '../item/Recipe.dart';
 
 class RecipeMain extends StatefulWidget {
   const RecipeMain({super.key});
@@ -10,40 +15,84 @@ class RecipeMain extends StatefulWidget {
   State<RecipeMain> createState() => _RecipeMain();
 }
 
+Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
+  var uri = Uri.http('13.209.50.91:8080', 'recipes',
+      {'orderBy': orderBy, 'page': page.toString()});
+
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
+
+  if (response.statusCode == 200) {
+    var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
+    return list.map((recipe) => Recipe.fromJson(recipe)).toList();
+  } else {
+    throw Exception("데이터를 받아오지 못함");
+  }
+}
+
 class _RecipeMain extends State<RecipeMain> {
-  get login => null;
+  late Future<List<Recipe>> recipeList;
+  late Future<List<Recipe>> popularList;
   String _selectedValue = '최근순';
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
-  List<Recipe> recipeAll = [];
+
+  @override
+  void initState() {
+    super.initState();
+    recipeList = fetchRecipe('recipeSeq', 0);
+    popularList = fetchRecipe('starRating', 0);
+  }
 
   @override
   Widget build(BuildContext context) {
     String keyword = '레시피';
+
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      List<String> recipeList = [];
-      for (int i = 0; i < 10; i++) {
-        recipeList.add('레시피${i + 1}입니다');
-      }
-      for (int i = 0; i < 10; i++) {
-        recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-            'assets/images/logo.png'));
-      }
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           child: ListView(
             children: [
-              searchBar(width - width / 15 * 2, height),
-              getTopList(width, height, recipeList, '인기 레시피'),
+              searchBar(width - width / 15 * 2, height, (value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RecipeSearch(value: value)));
+              }),
+              FutureBuilder<List<Recipe>>(
+                  future: popularList,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return getTopList(width, height, snapshot.data!, '인기레시피');
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  }),
               getOptionBar(width, height, options),
-              for (int i = 0; i < 10; i++)
-                getCard(width, height, recipeAll[i], i),
+              FutureBuilder<List<Recipe>>(
+                future: recipeList,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: <Widget>[
+                        ...snapshot.data!.map(
+                          (e) => getCard(width, height, e, 1),
+                        ),
+                      ],
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
             ],
           ),
         ),
@@ -53,7 +102,7 @@ class _RecipeMain extends State<RecipeMain> {
 
   Widget getCard(double width, double height, Recipe recipe, int idx) {
     return Container(
-      width: width - width / 12 * 2,
+      width: width - width / 15 * 2,
       height: height / 9,
       padding: EdgeInsets.fromLTRB(width / 30, 0, width / 30, 0),
       child: Column(children: [
@@ -66,7 +115,9 @@ class _RecipeMain extends State<RecipeMain> {
                 Padding(
                   padding: EdgeInsets.only(bottom: height / 100),
                   child: Text(
-                    recipe.title,
+                    recipe.title!.length < 15
+                        ? recipe.title!
+                        : '${recipe.title!.substring(0, 15)}...',
                     style: TextStyle(
                       fontSize: width / 25,
                       fontWeight: FontWeight.w300,
@@ -80,29 +131,23 @@ class _RecipeMain extends State<RecipeMain> {
                         right: width / 50,
                       ),
                       child: Text(
-                        recipe.starRating.toStringAsFixed(1),
+                        recipe.starRating!.toStringAsFixed(1),
                         style: TextStyle(
                           fontSize: width / 40,
                           color: Colors.red,
                         ),
                       ),
                     ),
-                    RatingBar.builder(
-                      initialRating:
-                          double.parse(recipe.starRating.toStringAsFixed(1)),
-                      minRating: 1,
+                    RatingBarIndicator(
+                      rating:
+                          double.parse(recipe.starRating!.toStringAsFixed(1)),
                       direction: Axis.horizontal,
-                      allowHalfRating: true,
                       itemCount: 5,
-                      itemPadding:
-                          EdgeInsets.symmetric(horizontal: width / 1000),
-                      itemBuilder: (context, _) => Icon(
+                      itemBuilder: (context, _) => const Icon(
                         Icons.star,
                         color: Colors.red,
                       ),
-                      onRatingUpdate: (rating) {
-                        print(rating);
-                      },
+                      unratedColor: Colors.white,
                       itemSize: width / 30,
                     ),
                     Padding(
@@ -121,9 +166,11 @@ class _RecipeMain extends State<RecipeMain> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  recipe.thumbnail,
+                Image.network(
+                  recipe.thumbnail!,
                   height: height / 18,
+                  width: width / 10,
+                  fit: BoxFit.cover,
                 ),
               ],
             ),
@@ -177,7 +224,8 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget getTopList(double width, double height, List list, String title) {
+  Widget getTopList(
+      double width, double height, List<Recipe> list, String title) {
     return Container(
       margin: EdgeInsets.only(top: height / 24),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
@@ -194,7 +242,7 @@ class _RecipeMain extends State<RecipeMain> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            '${title} TOP 10',
+            '${title} TOP 5',
             style: TextStyle(
               fontSize: width / 20,
               fontWeight: FontWeight.w600,
@@ -208,75 +256,18 @@ class _RecipeMain extends State<RecipeMain> {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < 5; i++)
                       Text(
-                        list[i],
+                        list[i].title!.length < 22
+                            ? '${i + 1}    ${list[i].title!}'
+                            : '${i + 1}    ${list[i].title!.substring(0, 22)}...',
                         style: TextStyle(
-                          fontSize: height / 40,
+                          fontSize: width / 25,
                           fontWeight: FontWeight.w400,
                           color: Colors.black87,
                         ),
-                      ),
-                  ],
-                ),
-                Container(
-                  width: 1,
-                  height: height / 4,
-                  margin: EdgeInsets.only(left: width / 30),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                    color: Colors.black38,
-                    width: 1.4,
-                  )),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 5; i < 10; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 5; i < 10; i++)
-                      Row(
-                        children: [
-                          Text(
-                            list[i],
-                            style: TextStyle(
-                              fontSize: height / 40,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
                       ),
                   ],
                 ),
@@ -288,7 +279,10 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget searchBar(double width, double height) {
+  Widget searchBar(
+      double width, double height, Function(String str) searchValue) {
+    String str = "";
+    TextEditingController valueController = TextEditingController();
     return Container(
       width: width,
       height: height / 19,
@@ -302,6 +296,7 @@ class _RecipeMain extends State<RecipeMain> {
             padding: EdgeInsets.only(left: width / 15),
             width: width * 0.85,
             child: TextFormField(
+              controller: valueController,
               decoration: const InputDecoration(
                 focusedBorder: InputBorder.none,
                 hintText: 'Search',
@@ -310,22 +305,22 @@ class _RecipeMain extends State<RecipeMain> {
           ),
           Padding(
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            child: Icon(
-              Icons.search,
-              size: width / 15 > height / 27 ? width / 15 : height / 27,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  str = valueController.text;
+                });
+                searchValue(str);
+              },
+              child: Icon(
+                Icons.search,
+                size: width / 15 > height / 27 ? width / 15 : height / 27,
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class Recipe {
-  String title;
-  double starRating;
-  int starCnt;
-  String thumbnail;
-
-  Recipe(this.title, this.starRating, this.starCnt, this.thumbnail);
 }

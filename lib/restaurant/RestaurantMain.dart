@@ -26,6 +26,7 @@ class _RestaurantMain extends State<RestaurantMain> {
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
@@ -38,6 +39,18 @@ class _RestaurantMain extends State<RestaurantMain> {
       );
     });
   }
+
+// Widget kakaoMap(double width, double height) {
+//   return Container(
+//     width: width / 3 * 2,
+//     height: height / 2,
+//     child: KakaoMap(
+//       onMapCreated: onMapCreated,
+//       initialCameraPosition: _kInitialPosition,
+//       mapType: MapType.standard,
+//     ),
+//   );
+// }
 
   Widget searchBar(double width, double height) {
     return Container(
