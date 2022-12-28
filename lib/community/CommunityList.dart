@@ -17,14 +17,18 @@ class CommunityList extends StatefulWidget {
 
 Future<List<Article>> fetchArticle(int boardSeq, String orderby,
     int page) async {
-  var uri = Uri.http('13.209.50.91:8080', 'articles',
-      {'boardSeq': boardSeq, 'orderby': orderby, 'page': page.toString()});
+  var uri = Uri.http('13.209.50.91:8080', 'articles', {
+    'boardSeq': boardSeq.toString(),
+    'orderBy': orderby,
+    'page': page.toString()
+  });
 
   final response = await http.get(uri, headers: {
     "access-token":
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
   print("여기 오나");
+  print(response.statusCode);
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     print("리스트");
@@ -43,71 +47,77 @@ class _CommunityList extends State<CommunityList> {
   List<String> options = ['최근순', '조회순', '추천순', '댓글순'];
 
   late Future<List<Article>> popularArticle;
+  late Future<List<Article>> article;
 
   @override
   void initState() {
     super.initState();
     popularArticle = fetchArticle(widget.value, 'articleLike', 0);
+    article = fetchArticle(widget.value, 'articleSeq', 0);
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final double width = constraints.maxWidth;
-          final double height = constraints.maxHeight;
-          // List<String> restList = [];
-          // List articleList = [];
-          // for (int i = 0; i < 10; i++) {
-          //   restList.add('맛집${i + 1}입니다');
-          //   articleList.add(Article(
-          //       1 + i,
-          //       1 + i,
-          //       '글쓴이$i',
-          //       1,
-          //       '제목$i',
-          //       '',
-          //       i * 15,
-          //       i * 50,
-          //       'assets/images/logo.png',
-          //       DateTime(2021, 12, 1, 16, 24, 30),
-          //       DateTime(2021, 12, 4, 15, 23, 10)));
-          // }
-          String keyword;
-          if (widget.value == 1) {
-            keyword = '맛집 추천';
-          } else {
-            keyword = '식단 자랑';
-          }
-          return Scaffold(
-            appBar: TopNav(
-              keyword: keyword, settingPressed: false,
+      final double width = constraints.maxWidth;
+      final double height = constraints.maxHeight;
+      String keyword;
+      if (widget.value == 1) {
+        keyword = '맛집 추천';
+      } else {
+        keyword = '식단 자랑';
+      }
+      return Scaffold(
+        appBar: TopNav(
+          keyword: keyword,
+          settingPressed: false,
+        ),
+        body: ListView(
+          padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
+          children: [
+            Text(
+              '${keyword}',
+              style: TextStyle(
+                fontSize: width / 15,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            body: ListView(
-              padding: EdgeInsets.fromLTRB(
-                  width / 15, height / 30, width / 15, 0),
-              children: [
-                Text(
-                  '${keyword}',
-                  style: TextStyle(
-                    fontSize: width / 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                // getList(width, height, restList, '맛집 추천'),
-                FutureBuilder<List<Article>>(
-                    future:,
-                    builder: builder)
-                getOptionBar(width, height, options),
-                for (int i = 0; i < 10; i++)
-                  getCard(width, height, articleList[i], i)
-              ],
-            ),
-          );
-        });
+            // getList(width, height, restList, '맛집 추천'),
+            FutureBuilder<List<Article>>(
+                future: popularArticle,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return getList(width, height, snapshot.data!, keyword);
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            getOptionBar(width, height, options),
+            FutureBuilder<List<Article>>(
+                future: article,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: <Widget>[
+                        ...snapshot.data!.map(
+                          (e) => getCard(width, height, e),
+                        )
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+          ],
+        ),
+      );
+    });
   }
 
-  Widget getCard(double width, double height, Article article, int idx) {
+  Widget getCard(double width, double height, Article article) {
     return Container(
       width: width - width / 12 * 2,
       height: height / 9,
@@ -116,62 +126,54 @@ class _CommunityList extends State<CommunityList> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: height / 100),
-                  child: Text(
-                    article.title,
-                    style: TextStyle(
-                      fontSize: width / 25,
-                      fontWeight: FontWeight.w300,
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: height / 100),
+                    child: Text(
+                      article.title!.length < 15
+                          ? article.title!
+                          : '${article.title!.substring(0, 15)}...',
+                      style: TextStyle(
+                        fontSize: width / 25,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
                   ),
-                ),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        right: width / 50,
-                      ),
-                      child: Text(
-                        '${article.nickname}   조회 ${article.viewCnt}',
-                        style: TextStyle(
-                          fontSize: width / 40,
-                          color: Colors.black,
-                          letterSpacing: 1,
-                        ),
-                      ),
+                  Text(
+                    '${article.nickname}   조회 ${article.viewCnt}    작성일 ${article.createdAt}',
+                    style: TextStyle(
+                      fontSize: width / 40,
+                      color: Colors.black,
+                      letterSpacing: 1,
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(left: width / 50),
-                      child: Text(
-                        '추천 ${article.like}',
-                        style:
-                        TextStyle(fontSize: width / 40, color: Colors.red),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: width / 40),
-                      child: Text(
-                        '댓글 ${article.like}',
-                        style: TextStyle(
-                            fontSize: width / 40, color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  article.url,
-                  height: height / 18,
-                ),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(4)),
+              child: Column(
+                children: [
+                  Text(
+                    '추천수',
+                    style: TextStyle(
+                        fontSize: width / 35, color: Colors.redAccent),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: height / 80),
+                    child: Text(
+                      '${article.like}',
+                      style: TextStyle(
+                          fontSize: width / 40, color: Colors.redAccent),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -180,7 +182,7 @@ class _CommunityList extends State<CommunityList> {
           height: 2,
           margin: EdgeInsets.only(top: height / 40),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black45, width: idx == 9 ? 0 : 1),
+            border: Border.all(color: Colors.black45, width: 1),
           ),
         )
       ]),
@@ -223,7 +225,8 @@ class _CommunityList extends State<CommunityList> {
     );
   }
 
-  Widget getList(double width, double height, List list, String title) {
+  Widget getList(
+      double width, double height, List<Article> list, String title) {
     return Container(
       margin: EdgeInsets.only(top: height / 50),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
@@ -273,7 +276,9 @@ class _CommunityList extends State<CommunityList> {
                   children: [
                     for (int i = 0; i < 5; i++)
                       Text(
-                        list[i],
+                        list[i].title!.length < 8
+                            ? list[i].title!
+                            : '${list[i].title!.substring(0, 8)}...',
                         style: TextStyle(
                           fontSize: height / 40,
                           fontWeight: FontWeight.w400,
@@ -315,7 +320,9 @@ class _CommunityList extends State<CommunityList> {
                       Row(
                         children: [
                           Text(
-                            list[i],
+                            list[i].title!.length < 8
+                                ? list[i].title!
+                                : '${list[i].title!.substring(0, 8)}...',
                             style: TextStyle(
                               fontSize: height / 40,
                               fontWeight: FontWeight.w400,

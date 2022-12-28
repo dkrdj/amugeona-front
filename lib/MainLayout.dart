@@ -25,8 +25,6 @@ Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
 
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-    List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
-    print(a);
     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");
@@ -48,7 +46,6 @@ Future<List<Article>> fetchArticle(
 
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-    List<Article> a = list.map((article) => Article.fromJson(article)).toList();
     return list.map((article) => Article.fromJson(article)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");

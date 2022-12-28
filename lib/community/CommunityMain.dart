@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
-import '../community/CommunityDetail.dart';
 import '../item/Article.dart';
 
 class CommunityMain extends StatefulWidget {
@@ -52,8 +51,8 @@ class _CommunityMain extends State<CommunityMain> {
 
   @override
   Widget build(BuildContext context) {
-    int restaurantArticleSeq = 1;
-    int recipeArticleSeq = 2;
+    int resBoard = 1;
+    int recipeBoard = 2;
     String keyword = '커뮤니티';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -83,8 +82,8 @@ class _CommunityMain extends State<CommunityMain> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => CommunityList(
-                                    value: restaurantArticleSeq)));
+                                builder: (context) =>
+                                    CommunityList(value: resBoard)));
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -116,7 +115,13 @@ class _CommunityMain extends State<CommunityMain> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: OutlinedButton(
-                      onPressed: recipePressed,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    CommunityList(value: recipeBoard)));
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -253,12 +258,4 @@ class _CommunityMain extends State<CommunityMain> {
     );
   }
 
-  // void restaurantPressed(Long boardSeq) {
-  //   Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //           builder: (context) => CommunityDetail(value: boardSeq)));
-  // }
-
-  void recipePressed() {}
 }

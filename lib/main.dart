@@ -2,7 +2,6 @@ import 'package:amugeona/router/TabNavigator.dart';
 import 'package:flutter/material.dart';
 
 import 'appBar/BottomNav.dart';
-import 'community/CommunityList.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,8 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const _MyApp(),
-      home: CommunityList(),
+      home: const _MyApp(),
+      // home: CommunityList(),
     );
   }
 }
