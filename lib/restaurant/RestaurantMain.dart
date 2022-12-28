@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -41,6 +42,36 @@ Future<Map<String, dynamic>> fetchRestaurant(double lng, double lat) async {
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     List<Restaurant> resList = list.map((restaurant) => Restaurant.fromJson(restaurant)).toList();
+    for(Restaurant restaurant in resList){
+      if(restaurant.image == null){
+        var kakaoUri = Uri.https('dapi.kakao.com', 'v2/search/image',{
+          'query': restaurant.title,
+        });
+        final kakaoResponse = await http.get(kakaoUri,headers: {
+          'Authorization': 'KakaoAK 9a24dd51c155d5733c3e021a02a163d5'
+        });
+        if(kakaoResponse.statusCode == 200){
+          var kakaoMap = jsonDecode(utf8.decode(kakaoResponse.bodyBytes)) as Map;
+          List kakaoList = kakaoMap['documents'] as List;
+          if(kakaoList.isNotEmpty){
+            Map kakaoMap2 = kakaoList[0] as Map;
+            restaurant.image = kakaoMap2['image_url'];
+          } else{
+            restaurant.image = 'notExist';
+          }
+          final putResponse = await Dio().put(
+            'http://13.209.50.91:8080/restaurant',
+            queryParameters: {
+              'restaurantSeq': restaurant.restaurantSeq.toString(),
+              'image' : restaurant.image
+            }
+          );
+        }
+        else{
+          throw Exception("카카오 검색 데이터를 받아오지 못함");
+        }
+      }
+    }
     List<Marker> markerList = resList.map((restaurant)=> Marker(markerId: restaurant.restaurantSeq!.toString(), position: LatLng(restaurant.latitude, restaurant.longitude), infoWindow: restaurant.title)).toList();
     Map<String, dynamic> map = {};
     map['resList'] = resList;
@@ -426,7 +457,9 @@ class _RestaurantMain extends State<RestaurantMain> {
                 ],
               ),
               Image.network(
-                'https://img.siksinhot.com/place/1376432165369645.png?w=540&h=436&c=Y',
+                (restaurant.image!)=='notExist'
+                    ?'https://scontent-gmp1-1.xx.fbcdn.net/v/t1.6435-9/145735547_4234340270003343_7357620444226112328_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=8bfeb9&_nc_ohc=nyXd1exrllUAX-ebUe8&_nc_ht=scontent-gmp1-1.xx&oh=00_AfDJ1NUJgK_I8SUrksb_HInU7y7ETR10NaOpUxceJqIIGg&oe=63D3E9C8'
+                    :restaurant.image!,
                 height: height / 12,
                 width: height / 12,
                 fit: BoxFit.cover,
