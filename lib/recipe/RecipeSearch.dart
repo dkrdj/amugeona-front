@@ -236,6 +236,7 @@ class _RecipeSearch extends State<RecipeSearch> {
             width: width * 0.85,
             child: TextFormField(
               controller: valueController,
+              // initialValue: widget.value,
               decoration: const InputDecoration(
                 focusedBorder: InputBorder.none,
                 hintText: 'Search',
