@@ -15,25 +15,36 @@ class MainLayout extends StatefulWidget {
 }
 
 Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
-  var uri = Uri.http('54.180.86.129:8080', 'recipe/list',
+  var uri = Uri.http('13.209.50.91:8080', 'recipes',
       {'orderBy': orderBy, 'page': page.toString()});
 
-  final response = await http.get(uri);
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
 
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
+    print(a);
     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");
   }
 }
 
-Future<List<Article>> fetchArticle(String orderBy, int page) async {
-  var uri = Uri.http('54.180.86.129:8080', 'article/listAll',
-      {'orderBy': orderBy, 'page': page.toString()});
+Future<List<Article>> fetchArticle(
+    int boardSeq, String orderBy, int page) async {
+  var uri = Uri.http('13.209.50.91:8080', 'articles', {
+    'boardSeq': boardSeq.toString(),
+    'orderBy': orderBy,
+    'page': page.toString()
+  });
 
-  final response = await http.get(uri);
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
 
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
@@ -47,20 +58,22 @@ Future<List<Article>> fetchArticle(String orderBy, int page) async {
 class _MainLayout extends State<MainLayout> {
   late Future<List<Recipe>> recipe;
 
-  // late Future<List<Article>> article;
+  late Future<List<Article>> restaurantArticle;
+  late Future<List<Article>> recipeArticle;
 
   @override
   void initState() {
     super.initState();
     recipe = fetchRecipe('starRating', 0);
-    // article = fetchArticle('createdAt', 0);
+    restaurantArticle = fetchArticle(1, 'viewCnt', 0);
+    recipeArticle = fetchArticle(2, 'viewCnt', 0);
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final double width = constraints.maxWidth;
+          final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
       final List<String> imageList = <String>[
         'assets/images/logo.png',
@@ -70,10 +83,11 @@ class _MainLayout extends State<MainLayout> {
         'assets/images/logo.png',
         'assets/images/logo.png',
       ];
-      String keyword = '현재 위치';
+      String keyword = 'Amugeona';
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
@@ -116,23 +130,46 @@ class _MainLayout extends State<MainLayout> {
                   },
                 )),
             Text(
-              '최근 주목 받는 글',
+              '주목 받는 글',
               style: TextStyle(
                 fontSize: width / 20,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            // FutureBuilder<List<Article>>(
-            //     future: article,
-            //     builder: (context, snapshot) {
-            //       if (snapshot.hasData) {
-            //         return getArticle(width, height, snapshot.data!);
-            //       }
-            //       return Text('dd');
-            //       // return const Center(
-            //       //   child: CircularProgressIndicator(),
-            //       // );
-            //     }),
+            Text(
+              '맛집 추천',
+              style: TextStyle(
+                fontSize: width / 25,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            FutureBuilder<List<Article>>(
+                future: restaurantArticle,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return getArticle(width, height, snapshot.data!);
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            Text(
+              '식단 자랑',
+              style: TextStyle(
+                fontSize: width / 25,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            FutureBuilder<List<Article>>(
+                future: recipeArticle,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return getArticle(width, height, snapshot.data!);
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
           ],
         ),
       );
@@ -142,7 +179,7 @@ class _MainLayout extends State<MainLayout> {
   Widget getArticle(double width, double height, List<Article> article) {
     return Column(
       children: [
-        for (int i = 0; i < article!.length; i++)
+        for (int i = 0; i < 5; i++)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

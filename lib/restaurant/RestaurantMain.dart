@@ -26,6 +26,7 @@ class _RestaurantMain extends State<RestaurantMain> {
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),

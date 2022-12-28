@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import '../user/MyPage.dart';
 
 class TopNav extends StatefulWidget with PreferredSizeWidget {
-  const TopNav({super.key, required this.keyword});
+  const TopNav(
+      {super.key, required this.keyword, required this.settingPressed});
 
   final String keyword;
+  final bool settingPressed;
 
   @override
   _TopNav createState() => _TopNav();
@@ -17,39 +19,10 @@ class TopNav extends StatefulWidget with PreferredSizeWidget {
 
 class _TopNav extends State<TopNav> {
   bool _bellPressed = false;
-  bool _settingPressed = false;
 
   _TopNav();
 
   Widget buildText(double width, double height, String keyword) {
-    switch (keyword) {
-      case '현재 위치':
-        return Container(
-          padding: EdgeInsets.only(
-            top: height / 30,
-            left: width / 20,
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: height / 30),
-                child: Text(
-                  '현재 위치',
-                  style: TextStyle(
-                    fontSize: height / 4,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.arrow_drop_down,
-                color: Colors.black54,
-                size: height / 2.5 > width / 15 ? width / 15 : height / 2.5,
-              ),
-            ],
-          ),
-        );
-      default:
         return Padding(
           padding: EdgeInsets.only(top: height / 30),
           child: Text(
@@ -60,7 +33,6 @@ class _TopNav extends State<TopNav> {
             ),
           ),
         );
-    }
   }
 
   @override
@@ -92,7 +64,7 @@ class _TopNav extends State<TopNav> {
               icon: Icon(
                 Icons.settings,
                 size: height / 2.5 > width / 12 ? width / 12 : height / 2.5,
-                color: _settingPressed ? Colors.red : Colors.black54,
+                color: widget.settingPressed ? Colors.red : Colors.black54,
               ),
               onPressed: settingPressed,
             )
@@ -104,9 +76,12 @@ class _TopNav extends State<TopNav> {
 
   void settingPressed() {
     setState(() {
-      _settingPressed = !_settingPressed;
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const MyPage()));
+      if (!widget.settingPressed) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const MyPage()));
+      } else {
+        Navigator.pop(context);
+      }
     });
   }
 

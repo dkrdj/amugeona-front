@@ -8,25 +8,30 @@ import '../appBar/TopNav.dart';
 import '../item/Recipe.dart';
 
 class RecipeSearch extends StatefulWidget {
-  const RecipeSearch({super.key});
+  const RecipeSearch({super.key, required this.value});
+
+  final String value;
 
   @override
   State<RecipeSearch> createState() => _RecipeSearch();
 }
 
 Future<List<Recipe>> fetchSearchRecipe(
-    String orderBy, String title, int page) async {
-  var uri = Uri.http('54.180.86.129:8080', 'recipe/search-title',
-      {'orderBy': orderBy, 'title': title, 'page': page.toString()});
-
+    String orderBy, String value, int page) async {
+  var uri = Uri.http('13.209.50.91:8080', 'recipe/search',
+      {'orderBy': orderBy, 'title': value, 'page': page.toString()});
+  print(value);
   final response = await http.get(uri, headers: {
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
-
+  print("여기 오나");
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    print("리스트");
+    print(list);
     List<Recipe> a = list.map((recipe) => Recipe.fromJson(recipe)).toList();
+    print(a);
     return list.map((recipe) => Recipe.fromJson(recipe)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");
@@ -43,7 +48,7 @@ class _RecipeSearch extends State<RecipeSearch> {
   @override
   void initState() {
     super.initState();
-    searchRecipe = fetchSearchRecipe('recipeSeq', 'title', 0);
+    searchRecipe = fetchSearchRecipe('starRating', widget.value, 0);
   }
 
   @override
@@ -53,18 +58,20 @@ class _RecipeSearch extends State<RecipeSearch> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      // for (int i = 0; i < 10; i++) {
-      //   recipeAll.add(Recipe("레시피${i + 1}", 4.3 - 0.05 * i, 200 - 10 * i,
-      //       'assets/images/logo.png'));
-      // }
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: ListView(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           children: [
-            searchBar(width - width / 15 * 2, height),
+            searchBar(width - width / 15 * 2, height, (value) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RecipeSearch(value: value)));
+            }),
             getOptionBar(width, height, options),
             FutureBuilder<List<Recipe>>(
                 future: searchRecipe,
@@ -81,8 +88,6 @@ class _RecipeSearch extends State<RecipeSearch> {
                     child: CircularProgressIndicator(),
                   );
                 })
-            // for (int i = 0; i < 10; i++)
-            //   getCard(width, height, recipeAll[i], i),
           ],
         ),
       );
@@ -127,22 +132,16 @@ class _RecipeSearch extends State<RecipeSearch> {
                         ),
                       ),
                     ),
-                    RatingBar.builder(
-                      initialRating:
+                    RatingBarIndicator(
+                      rating:
                           double.parse(recipe.starRating!.toStringAsFixed(1)),
-                      minRating: 1,
                       direction: Axis.horizontal,
-                      allowHalfRating: true,
                       itemCount: 5,
-                      itemPadding:
-                          EdgeInsets.symmetric(horizontal: width / 1000),
-                      itemBuilder: (context, _) => Icon(
+                      itemBuilder: (context, _) => const Icon(
                         Icons.star,
                         color: Colors.red,
                       ),
-                      onRatingUpdate: (rating) {
-                        print(rating);
-                      },
+                      unratedColor: Colors.white,
                       itemSize: width / 30,
                     ),
                     Padding(
@@ -161,9 +160,11 @@ class _RecipeSearch extends State<RecipeSearch> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
+                Image.network(
                   recipe.thumbnail!,
                   height: height / 18,
+                  width: width / 10,
+                  fit: BoxFit.cover,
                 ),
               ],
             ),
@@ -217,7 +218,10 @@ class _RecipeSearch extends State<RecipeSearch> {
     );
   }
 
-  Widget searchBar(double width, double height) {
+  Widget searchBar(
+      double width, double height, Function(String str) searchValue) {
+    String str = "";
+    TextEditingController valueController = TextEditingController();
     return Container(
       width: width,
       height: height / 19,
@@ -229,8 +233,9 @@ class _RecipeSearch extends State<RecipeSearch> {
         children: [
           Container(
             padding: EdgeInsets.only(left: width / 15),
-            width: width * 0.86,
+            width: width * 0.85,
             child: TextFormField(
+              controller: valueController,
               decoration: const InputDecoration(
                 focusedBorder: InputBorder.none,
                 hintText: 'Search',
@@ -239,9 +244,17 @@ class _RecipeSearch extends State<RecipeSearch> {
           ),
           Padding(
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            child: Icon(
-              Icons.search,
-              size: width / 13 > height / 25 ? width / 13 : height / 25,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  str = valueController.text;
+                });
+                searchValue(str);
+              },
+              child: Icon(
+                Icons.search,
+                size: width / 15 > height / 27 ? width / 15 : height / 27,
+              ),
             ),
           ),
         ],

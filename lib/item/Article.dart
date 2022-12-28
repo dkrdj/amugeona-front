@@ -7,9 +7,11 @@ class Article {
   String? content;
   int? like;
   int? viewCnt;
+
   String? url;
-  DateTime? createdAt;
-  DateTime? modifiedAt;
+  String? createdAt;
+  String? modifiedAt;
+  String? info;
 
   Article(
       {this.articleSeq,
@@ -21,10 +23,19 @@ class Article {
       this.like,
       this.viewCnt,
       this.url,
+      this.info,
       this.createdAt,
       this.modifiedAt});
 
   factory Article.fromJson(Map<String, dynamic> json) {
+    var createdAtList = (json['createdAt'] ?? []) as List;
+    var modifiedAtList = (json['modifiedAt'] ?? []) as List;
+
+    String modifiedAt = "";
+    if (modifiedAtList.isNotEmpty) {
+      modifiedAt =
+          "${modifiedAtList.sublist(0, 3).join("-")} ${modifiedAtList.sublist(3, modifiedAtList.length).join(":")}";
+    }
     return Article(
       articleSeq: json['articleSeq'],
       userSeq: json['userSeq'],
@@ -32,11 +43,13 @@ class Article {
       boardSeq: json['boardSeq'],
       title: json['title'],
       content: json['content'],
-      like: json['like'] ?? 0,
+      like: json['articleLike'] ?? 0,
       viewCnt: json['viewCnt'] ?? 0,
       url: json['url'],
-      createdAt: json['createdAt'],
-      modifiedAt: json['modifiedAt'],
+      info: json['info'],
+      createdAt:
+          "${createdAtList.sublist(0, 3).join("-")} ${createdAtList.sublist(3, createdAtList.length).join(":")}",
+      modifiedAt: modifiedAt,
     );
   }
 }

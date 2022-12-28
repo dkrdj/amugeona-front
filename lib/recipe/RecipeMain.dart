@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:amugeona/recipe/RecipeSearch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
@@ -15,7 +16,7 @@ class RecipeMain extends StatefulWidget {
 }
 
 Future<List<Recipe>> fetchRecipe(String orderBy, int page) async {
-  var uri = Uri.http('54.180.86.129:8080', 'recipe/list',
+  var uri = Uri.http('13.209.50.91:8080', 'recipes',
       {'orderBy': orderBy, 'page': page.toString()});
 
   final response = await http.get(uri, headers: {
@@ -56,12 +57,18 @@ class _RecipeMain extends State<RecipeMain> {
       return Scaffold(
         appBar: TopNav(
           keyword: keyword,
+          settingPressed: false,
         ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
           child: ListView(
             children: [
-              searchBar(width - width / 15 * 2, height),
+              searchBar(width - width / 15 * 2, height, (value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RecipeSearch(value: value)));
+              }),
               FutureBuilder<List<Recipe>>(
                   future: popularList,
                   builder: (context, snapshot) {
@@ -131,22 +138,16 @@ class _RecipeMain extends State<RecipeMain> {
                         ),
                       ),
                     ),
-                    RatingBar.builder(
-                      initialRating:
+                    RatingBarIndicator(
+                      rating:
                           double.parse(recipe.starRating!.toStringAsFixed(1)),
-                      minRating: 1,
                       direction: Axis.horizontal,
-                      allowHalfRating: true,
                       itemCount: 5,
-                      itemPadding:
-                          EdgeInsets.symmetric(horizontal: width / 1000),
-                      itemBuilder: (context, _) => Icon(
+                      itemBuilder: (context, _) => const Icon(
                         Icons.star,
                         color: Colors.red,
                       ),
-                      onRatingUpdate: (rating) {
-                        print(rating);
-                      },
+                      unratedColor: Colors.white,
                       itemSize: width / 30,
                     ),
                     Padding(
@@ -278,7 +279,10 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-  Widget searchBar(double width, double height) {
+  Widget searchBar(
+      double width, double height, Function(String str) searchValue) {
+    String str = "";
+    TextEditingController valueController = TextEditingController();
     return Container(
       width: width,
       height: height / 19,
@@ -292,6 +296,7 @@ class _RecipeMain extends State<RecipeMain> {
             padding: EdgeInsets.only(left: width / 15),
             width: width * 0.85,
             child: TextFormField(
+              controller: valueController,
               decoration: const InputDecoration(
                 focusedBorder: InputBorder.none,
                 hintText: 'Search',
@@ -300,13 +305,17 @@ class _RecipeMain extends State<RecipeMain> {
           ),
           Padding(
             padding: EdgeInsets.only(left: width / 40, right: width / 40),
-            // child: IconButton(
-            //     icon: Icon(Icons.search),
-            //     iconSize: width / 15 > height / 27 ? width / 15 : height / 27,
-            //     onPressed: () {}),
-            child: Icon(
-              Icons.search,
-              size: width / 15 > height / 27 ? width / 15 : height / 27,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  str = valueController.text;
+                });
+                searchValue(str);
+              },
+              child: Icon(
+                Icons.search,
+                size: width / 15 > height / 27 ? width / 15 : height / 27,
+              ),
             ),
           ),
         ],
@@ -314,5 +323,4 @@ class _RecipeMain extends State<RecipeMain> {
     );
   }
 
-// void searchRecipe() {}
 }
