@@ -1,6 +1,12 @@
+import 'dart:convert';
+
+import 'package:amugeona/community/CommunityList.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
+import '../community/CommunityDetail.dart';
+import '../item/Article.dart';
 
 class CommunityMain extends StatefulWidget {
   const CommunityMain({super.key});
@@ -9,23 +15,50 @@ class CommunityMain extends StatefulWidget {
   State<CommunityMain> createState() => _CommunityMain();
 }
 
+Future<List<Article>> fetchArticle(
+    int boardSeq, String orderBy, int page) async {
+  var uri = Uri.http('13.209.50.91:8080', 'articles', {
+    'boardSeq': boardSeq.toString(),
+    'orderBy': orderBy,
+    'page': page.toString()
+  });
+
+  final response = await http.get(uri, headers: {
+    "access-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
+  });
+
+  if (response.statusCode == 200) {
+    var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
+    List<Article> a = list.map((article) => Article.fromJson(article)).toList();
+    return list.map((article) => Article.fromJson(article)).toList();
+  } else {
+    throw Exception("데이터를 받아오지 못함");
+  }
+}
+
 class _CommunityMain extends State<CommunityMain> {
   get login => null;
 
+  late Future<List<Article>> restaurantArticle;
+  late Future<List<Article>> recipeArticle;
+
+  @override
+  void initState() {
+    super.initState();
+    restaurantArticle = fetchArticle(1, 'articleLike', 0);
+    recipeArticle = fetchArticle(2, 'articleLike', 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    int restaurantArticleSeq = 1;
+    int recipeArticleSeq = 2;
     String keyword = '커뮤니티';
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final double width = constraints.maxWidth;
       final double height = constraints.maxHeight;
-      List<String> restList = [];
-      List<String> mealList = [];
-
-      for (int i = 0; i < 10; i++) {
-        restList.add('맛집${i + 1}입니다');
-        mealList.add('식단${i + 1}입니다');
-      }
 
       return Scaffold(
         appBar: TopNav(
@@ -46,7 +79,13 @@ class _CommunityMain extends State<CommunityMain> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: OutlinedButton(
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CommunityList(
+                                    value: restaurantArticleSeq)));
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -77,7 +116,7 @@ class _CommunityMain extends State<CommunityMain> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: OutlinedButton(
-                      onPressed: null,
+                      onPressed: recipePressed,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -102,15 +141,34 @@ class _CommunityMain extends State<CommunityMain> {
                 ),
               ],
             ),
-            getList(width, height, restList, '맛집 추천'),
-            getList(width, height, mealList, '식단 자랑'),
+            FutureBuilder(
+                future: restaurantArticle,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return getList(width, height, snapshot.data!, '맛집 추천');
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            FutureBuilder(
+                future: recipeArticle,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return getList(width, height, snapshot.data!, '식단 자랑');
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
           ],
         ),
       );
     });
   }
 
-  Widget getList(double width, double height, List list, String title) {
+  Widget getList(
+      double width, double height, List<Article> list, String title) {
     return Container(
       margin: EdgeInsets.only(top: height / 15),
       padding: EdgeInsets.fromLTRB(0, height / 200, 0, height / 200),
@@ -141,26 +199,13 @@ class _CommunityMain extends State<CommunityMain> {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < 5; i++)
                       Text(
-                        list[i],
+                        list[i].title!.length < 6
+                            ? '${i + 1}    ${list[i].title!}'
+                            : '${i + 1}    ${list[i].title!.substring(0, 6)}...',
                         style: TextStyle(
                           fontSize: height / 40,
                           fontWeight: FontWeight.w400,
@@ -181,28 +226,15 @@ class _CommunityMain extends State<CommunityMain> {
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (int i = 5; i < 10; i++)
-                      Text(
-                        '${i + 1}.',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 5; i < 10; i++)
                       Row(
                         children: [
                           Text(
-                            list[i],
+                            list[i].title!.length < 6
+                                ? '${i + 1}    ${list[i].title!}'
+                                : '${i + 1}    ${list[i].title!.substring(0, 6)}...',
                             style: TextStyle(
                               fontSize: height / 40,
                               fontWeight: FontWeight.w400,
@@ -220,4 +252,13 @@ class _CommunityMain extends State<CommunityMain> {
       ),
     );
   }
+
+  // void restaurantPressed(Long boardSeq) {
+  //   Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //           builder: (context) => CommunityDetail(value: boardSeq)));
+  // }
+
+  void recipePressed() {}
 }

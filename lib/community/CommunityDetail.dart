@@ -6,11 +6,14 @@
 // import '../item/Article.dart';
 //
 // class CommunityDetail extends StatefulWidget {
-//   const CommunityDetail({Key? key}) : super(key: key);
+//   const CommunityDetail({Key? key, required this.value}) : super(key: key);
+//   final int value;
 //
 //   @override
 //   State<CommunityDetail> createState() => _CommunityDetailState();
 // }
+//
+// Future
 //
 // class _CommunityDetailState extends State<CommunityDetail> {
 //   @override
@@ -59,79 +62,82 @@
 //
 //     return LayoutBuilder(
 //         builder: (BuildContext context, BoxConstraints constraints) {
-//       final double width = constraints.maxWidth;
-//       final double height = constraints.maxHeight;
-//       return Scaffold(
-//         appBar: TopNav(
-//           keyword: keyword,
-//         ),
-//         body: ListView(
-//           padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
-//           children: [
-//             Text(
-//               // article.title,
-//               style: TextStyle(
-//                 fontSize: width / 15,
-//                 fontWeight: FontWeight.w600,
-//               ),
+//           final double width = constraints.maxWidth;
+//           final double height = constraints.maxHeight;
+//           return Scaffold(
+//             appBar: TopNav(
+//               keyword: keyword,
 //             ),
-//             Container(
-//               margin: EdgeInsets.only(top: height / 50),
-//               child: Text(
-//                 article.nickname + ' | ' + article.createdAt.toString(),
-//                 style: TextStyle(
-//                   fontSize: width / 30,
-//                 ),
-//               ),
-//             ),
-//             Text(
-//               '조회 : ${article.viewCnt} | 추천 : ${article.like}',
-//               style: TextStyle(
-//                 fontSize: width / 30,
-//               ),
-//             ),
-//             Padding(
-//               padding: EdgeInsets.only(top: height / 30, bottom: height / 30),
-//               child: Image(
-//                 image: AssetImage(article.url),
-//                 height: height / 4.8,
-//               ),
-//             ),
-//             Text(
-//               article.content,
-//               style: TextStyle(
-//                 fontSize: width / 25,
-//                 height: 1.5,
-//               ),
-//             ),
-//             Container(
-//               width: width - width / 15 * 2,
-//               margin: EdgeInsets.only(top: height / 40, bottom: height / 70),
-//               decoration: const BoxDecoration(
-//                 border: Border(
-//                   bottom: BorderSide(
-//                     width: 3.5,
-//                     color: Colors.black45,
+//             body: ListView(
+//               padding: EdgeInsets.fromLTRB(
+//                   width / 15, height / 30, width / 15, 0),
+//               children: [
+//                 Text(
+//                   // article.title,
+//                   style: TextStyle(
+//                     fontSize: width / 15,
+//                     fontWeight: FontWeight.w600,
 //                   ),
 //                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: EdgeInsets.only(bottom: height / 100),
-//               child: Text(
-//                 '댓글',
-//                 style: TextStyle(
-//                   fontSize: width / 20,
-//                   fontWeight: FontWeight.w600,
+//                 Container(
+//                   margin: EdgeInsets.only(top: height / 50),
+//                   child: Text(
+//                     article.nickname + ' | ' + article.createdAt.toString(),
+//                     style: TextStyle(
+//                       fontSize: width / 30,
+//                     ),
+//                   ),
 //                 ),
-//               ),
+//                 Text(
+//                   '조회 : ${article.viewCnt} | 추천 : ${article.like}',
+//                   style: TextStyle(
+//                     fontSize: width / 30,
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: EdgeInsets.only(
+//                       top: height / 30, bottom: height / 30),
+//                   child: Image(
+//                     image: AssetImage(article.url),
+//                     height: height / 4.8,
+//                   ),
+//                 ),
+//                 Text(
+//                   article.content,
+//                   style: TextStyle(
+//                     fontSize: width / 25,
+//                     height: 1.5,
+//                   ),
+//                 ),
+//                 Container(
+//                   width: width - width / 15 * 2,
+//                   margin: EdgeInsets.only(
+//                       top: height / 40, bottom: height / 70),
+//                   decoration: const BoxDecoration(
+//                     border: Border(
+//                       bottom: BorderSide(
+//                         width: 3.5,
+//                         color: Colors.black45,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: EdgeInsets.only(bottom: height / 100),
+//                   child: Text(
+//                     '댓글',
+//                     style: TextStyle(
+//                       fontSize: width / 20,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                 ),
+//                 for (int i = 0; i < commentList.length; i++)
+//                   getComment(commentList[i], width, height),
+//               ],
 //             ),
-//             for (int i = 0; i < commentList.length; i++)
-//               getComment(commentList[i], width, height),
-//           ],
-//         ),
-//       );
-//     });
+//           );
+//         });
 //   }
 //
 //   Widget getComment(Comment comment, double width, double height) {
@@ -170,7 +176,7 @@
 //           ),
 //           Padding(
 //             padding:
-//                 EdgeInsets.fromLTRB(width / 50, height / 100, 0, height / 100),
+//             EdgeInsets.fromLTRB(width / 50, height / 100, 0, height / 100),
 //             child: Text(
 //               comment.content,
 //             ),
@@ -203,8 +209,8 @@
 //     );
 //   }
 //
-//   Widget getReplyComment(
-//       ReplyComment replyComment, double width, double height) {
+//   Widget getReplyComment(ReplyComment replyComment, double width,
+//       double height) {
 //     return Column(
 //       crossAxisAlignment: CrossAxisAlignment.end,
 //       children: [
