@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../appBar/TopNav.dart';
 import '../item/Article.dart';
+import 'CommunityDetail.dart';
 
 class CommunityList extends StatefulWidget {
   const CommunityList({super.key, required this.value});
@@ -275,16 +276,25 @@ class _CommunityList extends State<CommunityList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < 5; i++)
-                      Text(
-                        list[i].title!.length < 8
-                            ? list[i].title!
-                            : '${list[i].title!.substring(0, 8)}...',
-                        style: TextStyle(
-                          fontSize: height / 40,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black87,
+                      GestureDetector(
+                        child: Text(
+                          list[i].title!.length < 8
+                              ? list[i].title!
+                              : '${list[i].title!.substring(0, 8)}...',
+                          style: TextStyle(
+                            fontSize: height / 40,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CommunityDetail(
+                                      value: list[i].articleSeq!)));
+                        },
+                      )
                   ],
                 ),
                 Container(
