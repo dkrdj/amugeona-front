@@ -28,14 +28,8 @@ Future<List<Article>> fetchArticle(int boardSeq, String orderby,
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
-  print("여기 오나");
-  print(response.statusCode);
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-    print("리스트");
-    print(list);
-    List<Article> a = list.map((article) => Article.fromJson(article)).toList();
-    print(a);
     return list.map((article) => Article.fromJson(article)).toList();
   } else {
     throw Exception("데이터를 받아오지 못함");
@@ -278,9 +272,9 @@ class _CommunityList extends State<CommunityList> {
                     for (int i = 0; i < 5; i++)
                       GestureDetector(
                         child: Text(
-                          list[i].title!.length < 8
+                          list[i].title!.length < 7
                               ? list[i].title!
-                              : '${list[i].title!.substring(0, 8)}...',
+                              : '${list[i].title!.substring(0, 7)}...',
                           style: TextStyle(
                             fontSize: height / 40,
                             fontWeight: FontWeight.w400,
@@ -292,7 +286,8 @@ class _CommunityList extends State<CommunityList> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => CommunityDetail(
-                                      value: list[i].articleSeq!)));
+                                      value: list[i].articleSeq!,
+                                      boardSeq: widget.value)));
                         },
                       )
                   ],
