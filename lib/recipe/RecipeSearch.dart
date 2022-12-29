@@ -20,7 +20,6 @@ Future<List<Recipe>> fetchSearchRecipe(
     String orderBy, String value, int page) async {
   var uri = Uri.http('13.209.50.91:8080', 'recipe/search',
       {'orderBy': orderBy, 'title': value, 'page': page.toString()});
-  print(value);
   final response = await http.get(uri, headers: {
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"

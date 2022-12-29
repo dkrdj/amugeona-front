@@ -42,13 +42,11 @@ Future<Map<String, dynamic>> fetchComment(int articleSeq, int page) async {
     "access-token":
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
-  print("이건 comment");
 
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     List<Comment> commentList = list.map((e) => Comment.fromJson(e)).toList();
 
-    print(commentList);
     List<ReplyComment> replyList = [];
 
     for (Comment comment in commentList) {
@@ -60,16 +58,10 @@ Future<Map<String, dynamic>> fetchComment(int articleSeq, int page) async {
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
       });
 
-      print("이건 replyComment");
       if (replyResponse.statusCode == 200) {
         var reply = jsonDecode(utf8.decode(replyResponse.bodyBytes)) as List;
-        print(jsonDecode(utf8.decode(replyResponse.bodyBytes)));
         List<ReplyComment> a =
             reply.map((e) => ReplyComment.fromJson(e)).toList();
-
-        for (ReplyComment r in a) {
-          print(r.toString());
-        }
         replyList.addAll(a);
       }
     }
@@ -271,10 +263,7 @@ class _CommunityDetailState extends State<CommunityDetail> {
                   return Column(
                     children: <Widget>[
                       ...snapshot.data!.map((e) {
-                        print("확인");
-                        print(e.rootSeq);
                         if (e.rootSeq == comment.commentSeq) {
-                          print("넘어가야지,,,");
                           return getReplyComment(
                               e, width, height, comment.commentSeq!);
                         } else {
