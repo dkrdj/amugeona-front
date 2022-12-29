@@ -16,6 +16,11 @@ class ReplyComment {
       this.createdAt,
       this.modifiedAt});
 
+  @override
+  String toString() {
+    return 'ReplyComment{replySeq: $replySeq, rootSeq: $rootSeq, userSeq: $userSeq, nickname: $nickname, content: $content, createdAt: $createdAt, modifiedAt: $modifiedAt}';
+  }
+
   factory ReplyComment.fromJson(Map<String, dynamic> json) {
     var createdAtList = (json['createdAt'] ?? []) as List;
     var modifiedAtList = (json['modifiedAt'] ?? []) as List;

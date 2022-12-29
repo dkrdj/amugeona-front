@@ -43,11 +43,14 @@ Future<Map<String, dynamic>> fetchComment(int articleSeq, int page) async {
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyU2VxIjo1LCJpZCI6InVzZXIxIiwibmFtZSI6InVzZXIxIiwibmlja25hbWUiOiJ1c2VyMSJ9.DOcF2SQksHPCTZfxPrjJO0CbYl2oQ205f3tslMvbcO4"
   });
   print("이건 comment");
+
   if (response.statusCode == 200) {
     var list = jsonDecode(utf8.decode(response.bodyBytes)) as List;
     List<Comment> commentList = list.map((e) => Comment.fromJson(e)).toList();
+
     print(commentList);
     List<ReplyComment> replyList = [];
+
     for (Comment comment in commentList) {
       var replyUri = Uri.http('13.209.50.91:8080', 'replies',
           {'rootSeq': comment.commentSeq.toString(), 'page': page.toString()});
@@ -58,16 +61,16 @@ Future<Map<String, dynamic>> fetchComment(int articleSeq, int page) async {
       });
 
       print("이건 replyComment");
-      print(replyResponse.statusCode);
       if (replyResponse.statusCode == 200) {
-        var reply = jsonDecode(utf8.decode(response.bodyBytes)) as List;
-        print("reply");
+        var reply = jsonDecode(utf8.decode(replyResponse.bodyBytes)) as List;
+        print(jsonDecode(utf8.decode(replyResponse.bodyBytes)));
         List<ReplyComment> a =
             reply.map((e) => ReplyComment.fromJson(e)).toList();
-        print(a);
+
         for (ReplyComment r in a) {
-          replyList.add(r);
+          print(r.toString());
         }
+        replyList.addAll(a);
       }
     }
     Map<String, dynamic> map = {};
@@ -89,8 +92,8 @@ class _CommunityDetailState extends State<CommunityDetail> {
     super.initState();
     Future<Map<String, dynamic>> map = fetchComment(widget.value, 0);
     article = fetchArticle(widget.value);
-    comment = map.then((value) => value['comment']);
     reply = map.then((value) => value['reply']);
+    comment = map.then((value) => value['comment']);
   }
 
   @override
@@ -218,9 +221,6 @@ class _CommunityDetailState extends State<CommunityDetail> {
                 ),
               ),
             ),
-
-            // for (int i = 0; i < commentList.length; i++)
-            //   getComment(commentList[i], width, height),
           ],
         ));
   }
@@ -264,6 +264,30 @@ class _CommunityDetailState extends State<CommunityDetail> {
               child: Text('답글'),
             ),
           ),
+          FutureBuilder<List<ReplyComment>>(
+              future: reply,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: <Widget>[
+                      ...snapshot.data!.map((e) {
+                        print("확인");
+                        print(e.rootSeq);
+                        if (e.rootSeq == comment.commentSeq) {
+                          print("넘어가야지,,,");
+                          return getReplyComment(
+                              e, width, height, comment.commentSeq!);
+                        } else {
+                          return Container();
+                        }
+                      })
+                    ],
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }),
           Container(
             width: width - width / 15 * 2,
             margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
@@ -276,23 +300,6 @@ class _CommunityDetailState extends State<CommunityDetail> {
               ),
             ),
           ),
-          FutureBuilder<List<ReplyComment>>(
-              future: reply,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                    children: <Widget>[
-                      ...snapshot.data!.map((e) => getReplyComment(
-                          e, width, height, comment.commentSeq!))
-                    ],
-                  );
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              })
-          // for (int i = 0; i < 3; i++)
-          //   getReplyComment(replyList[i], width, height),
         ],
       ),
     );
@@ -300,10 +307,23 @@ class _CommunityDetailState extends State<CommunityDetail> {
 
   Widget getReplyComment(
       ReplyComment replyComment, double width, double height, int commentSeq) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (replyComment.rootSeq == commentSeq)
+    return Padding(
+      padding: EdgeInsets.only(left: width / 50),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            width: width - width / 7,
+            margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  width: 1,
+                  color: Colors.black26,
+                ),
+              ),
+            ),
+          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -346,19 +366,8 @@ class _CommunityDetailState extends State<CommunityDetail> {
               ),
             ],
           ),
-        Container(
-          width: width - width / 5,
-          margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                width: 1,
-                color: Colors.black26,
-              ),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
