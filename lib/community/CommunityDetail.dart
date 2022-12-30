@@ -144,7 +144,6 @@ class _CommunityDetailState extends State<CommunityDetail> {
 
   Widget getDetail(double width, double height, Article article) {
     return Container(
-        padding: EdgeInsets.fromLTRB(width / 15, height / 30, width / 15, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -220,76 +219,78 @@ class _CommunityDetailState extends State<CommunityDetail> {
   Widget getComment(Comment comment, double width, double height) {
     return Padding(
       padding: EdgeInsets.fromLTRB(width / 60, 0, width / 60, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                comment.nickname!,
-                style: TextStyle(
-                  fontSize: width / 28,
+      child: Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  comment.nickname!,
+                  style: TextStyle(
+                    fontSize: width / 28,
+                  ),
                 ),
+                Text(
+                  comment.createdAt!,
+                  style: TextStyle(
+                    fontSize: width / 40,
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.fromLTRB(width / 50, height / 100, 0, height / 100),
+              child: Text(
+                comment.content!,
               ),
-              Text(
-                comment.createdAt!,
-                style: TextStyle(
-                  fontSize: width / 40,
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding:
-                EdgeInsets.fromLTRB(width / 50, height / 100, 0, height / 100),
-            child: Text(
-              comment.content!,
             ),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(width / 40, 0, 0, height / 100),
-            width: width / 8,
-            height: height / 40,
-            child: OutlinedButton(
-              onPressed: null,
-              child: Text('답글'),
+            Container(
+              margin: EdgeInsets.fromLTRB(width / 40, 0, 0, height / 100),
+              width: width / 8,
+              height: height / 40,
+              child: OutlinedButton(
+                onPressed: null,
+                child: Text('답글'),
+              ),
             ),
-          ),
-          FutureBuilder<List<ReplyComment>>(
-              future: reply,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                    children: <Widget>[
-                      ...snapshot.data!.map((e) {
-                        if (e.rootSeq == comment.commentSeq) {
-                          return getReplyComment(
-                              e, width, height, comment.commentSeq!);
-                        } else {
-                          return Container();
-                        }
-                      })
-                    ],
+            FutureBuilder<List<ReplyComment>>(
+                future: reply,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: <Widget>[
+                        ...snapshot.data!.map((e) {
+                          if (e.rootSeq == comment.commentSeq) {
+                            return getReplyComment(
+                                e, width, height, comment.commentSeq!);
+                          } else {
+                            return Container();
+                          }
+                        })
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }),
-          Container(
-            width: width - width / 15 * 2,
-            margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  width: 1,
-                  color: Colors.black45,
+                }),
+            Container(
+              width: width - width / 15 * 2,
+              margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    width: 1,
+                    color: Colors.black45,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -298,64 +299,68 @@ class _CommunityDetailState extends State<CommunityDetail> {
       ReplyComment replyComment, double width, double height, int commentSeq) {
     return Padding(
       padding: EdgeInsets.only(left: width / 50),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            width: width - width / 7,
-            margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  width: 1,
-                  color: Colors.black26,
+      child: Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              width: width - width / 7,
+              margin: EdgeInsets.only(top: height / 200, bottom: height / 100),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    width: 1,
+                    color: Colors.black26,
+                  ),
                 ),
               ),
             ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: height / 200),
-                child: Icon(
-                  Icons.subdirectory_arrow_right,
-                  size: width / 25,
-                  color: Colors.black45,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: height / 200),
+                  child: Icon(
+                    Icons.subdirectory_arrow_right,
+                    size: width / 25,
+                    color: Colors.black45,
+                  ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        replyComment.nickname!,
-                        style: TextStyle(
-                          fontSize: width / 28,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            replyComment.nickname!,
+                            style: TextStyle(
+                              fontSize: width / 28,
+                            ),
+                          ),
+                          Text(
+                            '  ${replyComment.createdAt}',
+                            style: TextStyle(
+                              fontSize: width / 40,
+                            ),
+                          )
+                        ],
                       ),
-                      Text(
-                        '  ${replyComment.createdAt}',
-                        style: TextStyle(
-                          fontSize: width / 40,
+                        Container(
+                          padding: EdgeInsets.fromLTRB(
+                              width / 50, height / 100, 0, height / 100),
+                          child: Text(
+                            replyComment.content!,
+                          ),
                         ),
-                      )
                     ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width / 50, height / 100, 0, height / 100),
-                    child: Text(
-                      replyComment.content!,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
